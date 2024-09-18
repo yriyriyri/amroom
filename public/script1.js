@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const socket = new WebSocket('ws://localhost:3000');
 
     let currentColor = getRandomHexColor();
+    applyColor(currentColor)
     let currentUserColor = getRandomHexColor();
     let currentUsername = getRandomUsername();
 
