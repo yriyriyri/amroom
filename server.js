@@ -15,6 +15,21 @@ const wss = new WebSocket.Server({ server });
 app.use(morgan('combined')); // Log HTTP requests
 app.use(helmet()); // Secure HTTP headers
 
+
+const helmet = require('helmet');
+
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts if necessary
+            imgSrc: ["'self'", "https://i.ibb.co"], // Allow external image sources
+            styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles if necessary
+        },
+    },
+}));
+
+
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
