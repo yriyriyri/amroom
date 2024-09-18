@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>  
+  <head>    
+    <meta charset="utf-8">    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">        
+    <title>Ubuntu Terminal</title>    
+    <meta name="description" content="">    
+    <meta name="viewport" content="width=device-width, initial-scale=1">    
+    <link rel="stylesheet" type="text/css" href="style1.css"/>
+  </head>  
+  <body>  
+    <main id="container">
+      <div id ="terminal">
+        <!-- Terminal Bar -->       
+        <section id="terminal__bar">          
+          <div id="bar__buttons">            
+            <button class="bar__button" id="bar__button--exit">&#10005;</button>            
+            <button class="bar__button">&#9472;</button>                
+            <button class="bar__button">&#9723;</button>          
+          </div>          
+          <p id="bar__user">encrypedchatroooom@mainroom: ~</p>        
+        </section> 
+
+        <!-- Terminal Body -->        
+        <section id="terminal__body">
+          <ul id="messages"></ul>         
+          <div id="terminal__prompt">            
+            <span id="writing-message"></span>  
+          </div>
+          <!-- Hidden input field to capture user input -->
+          <input type="text" id="user-input" autofocus>
+        </section> 
+        </div>
+      
+      <div id="terminalconsole"> 
+        <section id="terminal__bar-console">          
+          <div id="bar__buttons">            
+            <button class="bar__button" id="bar__button--exit">&#10005;</button>            
+            <button class="bar__button">&#9472;</button>                
+            <button class="bar__button">&#9723;</button>          
+          </div>          
+          <p id="bar__user">encrypedchatroooom@console: ~</p>        
+        </section> 
+        <section id="terminal__body">
+          <ul id="messages-console"></ul>         
+          <div id="terminal__prompt">            
+            <span id="writing-message-console"></span>  
+          </div>
+          <!-- Hidden input field to capture user input -->
+          <input type="text" id="user-input" autofocus>
+        </section>
+      </div>    
+    </main>
+    <script src="script1.js"></script>
+  </body>
+</html>

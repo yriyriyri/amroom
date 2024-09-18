@@ -1,0 +1,282 @@
+@import url('https://fonts.googleapis.com/css?family=Ubuntu');
+@import url('https://fonts.googleapis.com/css?family=Ubuntu+Mono'); 
+@import url('https://fonts.googleapis.com/css?family=Tangerine');
+@import url('https://fonts.googleapis.com/css?family=Mrs+Saint+Delafield');
+
+body { 
+  /* background: linear-gradient(45deg, #0f0be9 0%,#0bebdf 100%);  */
+  background-image: url('https://i.ibb.co/vXKCtTp/1725217284794c-crop-2024-09-18-22-43-51.jpg');  
+  background-size: cover;                      
+  background-position: center;                 
+  background-repeat: no-repeat;                
+  height: 100vh;                              
+  margin: 0;                                  
+  font-family: 'Ubuntu';
+  overflow: hidden;
+} 
+#container {  
+  display: flex;  
+  justify-content: center;  
+  align-items: center;  
+  height: 100vh;
+} 
+#terminal {  
+  position: absolute;
+  width: 90vw;  
+  height: 80vh;  
+  left: 100;
+  top: 100;
+  box-shadow: 2px 4px 10px rgba(0,0,0,0.5);
+  z-index: 1;
+} 
+#terminalconsole {  
+  position: absolute;
+  width: 50vw;  
+  height: 40vh;  
+  left: 100;
+  top: 100;
+  box-shadow: 2px 4px 10px rgba(0,0,0,0.5);
+  z-index:  2;
+} 
+#terminal__bar {  
+  position: relative;
+  display: flex;  
+  width: 100%;  
+  height: 30px;  
+  align-items: center;  
+  padding: 0 8px;  
+  box-sizing: border-box;  
+  border-top-left-radius: 5px;  
+  border-top-right-radius: 5px;  
+  background: linear-gradient(#504b45 0%,#3c3b37 100%);
+} 
+#terminal__bar-console {  
+  position: relative;
+  display: flex;  
+  width: 100%;  
+  height: 30px;  
+  align-items: center;  
+  padding: 0 8px;  
+  box-sizing: border-box;  
+  border-top-left-radius: 5px;  
+  border-top-right-radius: 5px;  
+  background: linear-gradient(#504b45 0%,#3c3b37 100%);
+} 
+#bar__buttons {  
+  display: flex;  
+  align-items: center;
+} 
+.bar__button {  
+  display: flex;  
+  justify-content: center;  
+  align-items: center;  
+  padding: 0;  
+  margin-right: 5px;  
+  font-size: 8px;  
+  height: 12px;  
+  width: 12px;  
+  box-sizing: border-box;  
+  border: none;  
+  border-radius: 100%;  
+  background: linear-gradient(#7d7871 0%, #595953 100%);  
+  text-shadow: 0px 1px 0px rgba(255,255,255,0.2);  
+  box-shadow: 0px 0px 1px 0px #41403A, 0px 1px 1px 0px #474642;
+}
+.bar__button:hover {  
+  cursor: pointer;
+}
+.bar__button:focus {  
+  outline: none;
+}
+#bar__button--exit {  
+  background: linear-gradient(#f37458 0%, #de4c12 100%);    
+  background-clip: padding-box;
+} 
+#bar__user {   
+  color: #d5d0ce;  
+  margin-left: 6px;  
+  font-size: 14px;  
+  line-height: 15px;
+} 
+#terminal__body {  
+  background: rgba(228, 225, 228, 0.4); 
+  display: flex;
+  flex-direction: column; /* Ensure vertical layout */ 
+  font-family: 'Ubuntu Mono';  
+  height: calc(100% - 30px);  
+  padding-top: 2px;  
+  margin-top: -1px;
+  overflow-y: auto;
+} 
+#terminal__prompt {  
+  display: flex;
+  align-items: flex-end;
+  /*border: 1px solid #ccc;*/         
+}
+#terminal__prompt-console {  
+  display: flex;
+  align-items: flex-end;
+  /*border: 1px solid #ccc; */         
+}
+#terminal__prompt--cursor {  
+  display: inline-block;  
+  height: 0.8em;  
+  width: 8px;  
+  margin-left: 0px;  
+  overflow-y: hidden;
+  animation: blink 1200ms linear infinite;
+  vertical-align: baseline;
+} 
+@keyframes blink {  
+  0% {    
+    background: #ffffff;  
+  }  
+  49% {    
+    background: #ffffff;  
+  }  
+  60% {    
+    background: transparent;  
+  }  
+  99% {    
+    background: transparent;  
+  }  100% {    
+    background: #ffffff;  
+  }
+} 
+@media (max-width: 600px) {  
+  #terminal {    
+    max-height: 90%;    
+    width: 90%;  
+  }
+}
+
+#terminal__prompt--consolecursor {  
+  display: inline-block;  
+  height: 0.8em;  
+  width: 8px;  
+  margin-left: 0px;  
+  overflow-y: hidden;
+  animation: consoleblink 1200ms linear infinite;
+  vertical-align: baseline;
+} 
+@keyframes consoleblink {  
+  0% {    
+    background: #880000;  
+  }  
+  49% {    
+    background: #880000;  
+  }  
+  60% {    
+    background: transparent;  
+  }  
+  99% {    
+    background: transparent;  
+  }  100% {    
+    background: #880000;  
+  }
+} 
+@media (max-width: 600px) {  
+  #terminal {    
+    max-height: 90%;    
+    width: 90%;  
+  }
+}
+
+#writing-message {
+  display: inline-block;
+  padding: 0;            
+  margin: 0;  
+  overflow-y: auto;         
+  white-space: pre-wrap; 
+  word-wrap: break-word; 
+  overflow-wrap: break-word; 
+}
+
+#writing-message-console {
+  display: inline-block;
+  padding: 0;            
+  margin: 0;  
+  overflow-y: auto;         
+  white-space: pre-wrap; 
+  word-wrap: break-word; 
+  overflow-wrap: break-word; 
+}
+
+#user-input {
+  position: absolute;
+  left: -9999px; 
+}
+
+#user-input-console {
+  position: absolute;
+  left: -9999px; 
+}
+
+#messages {
+  list-style-type: none; 
+  padding: 0;            
+  margin: 0;         
+  overflow-y: auto;         
+  white-space: pre-wrap; 
+  word-wrap: break-word; 
+  overflow-wrap: break-word; 
+}
+
+#messages-console {
+  list-style-type: none; 
+  padding: 0;            
+  margin: 0;         
+  overflow-y: auto;         
+  white-space: pre-wrap; 
+  word-wrap: break-word; 
+  overflow-wrap: break-word; 
+}
+
+/* Hide scrollbar for WebKit browsers */
+#messages::-webkit-scrollbar {
+  width: 0; /* Remove scrollbar space */
+}
+
+#messages::-webkit-scrollbar:horizontal {
+  height: 0; /* Remove scrollbar space */
+}
+
+#messages {
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
+}
+
+/* Hide scrollbar for WebKit browsers */
+#messages-console::-webkit-scrollbar {
+  width: 0; /* Remove scrollbar space */
+}
+
+#messages-console::-webkit-scrollbar:horizontal {
+  height: 0; /* Remove scrollbar space */
+}
+
+#messages-console {
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
+}
+
+.link {
+  color: #00aaff;
+  text-decoration: underline;
+}
+
+/*printed*/
+
+.prompt-user {
+  color: #002323;
+}
+
+.prompt-admin {
+  color: #880000; 
+}
+
+.prompt-location {
+  color: #063267; 
+}
+
+.prompt-bling {
+  color: #030ad1; 
+}
