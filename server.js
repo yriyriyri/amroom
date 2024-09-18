@@ -23,7 +23,7 @@ app.use(helmet({
         directives: {
             defaultSrc: ["'self'"],
             scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts if necessary
-            imgSrc: ["'self'", "https://i.ibb.co"], // Allow external image sources
+            imgSrc: ["*"], // Allow external image sources
             styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles if necessary
         },
     },
