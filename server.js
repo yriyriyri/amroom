@@ -15,16 +15,14 @@ const wss = new WebSocket.Server({ server });
 app.use(morgan('combined')); // Log HTTP requests
 app.use(helmet()); // Secure HTTP headers
 
-
-const helmet = require('helmet');
-
 app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
-            scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts if necessary
-            imgSrc: ["*"], // Allow external image sources
-            styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles if necessary
+            scriptSrc: ["'self'", "'unsafe-inline'"],  // Allow inline scripts if necessary
+            styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],  // Allow external styles and inline styles
+            fontSrc: ["'self'", "https://fonts.gstatic.com"],  // Allow font sources from Google Fonts
+            imgSrc: ["*"],  // Allow images from any source
         },
     },
 }));
