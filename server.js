@@ -6,10 +6,13 @@ const WebSocket = require('ws');
 const path = require('path');
 const morgan = require('morgan');
 const helmet = require('helmet');
+const crypto = require('crypto');
 
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
+
+const secretKey = 'default_session_key';
 
 // Middleware
 app.use(morgan('combined')); // Log HTTP requests
@@ -27,25 +30,34 @@ app.use(helmet({
     },
 }));
 
-
-// Serve static files from the 'public' directory
+// serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Serve the HTML file for the root route
+// serve the HTML file for the root route
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index1.html'));
 });
 
-// WebSocket handling
+function encrypt(text, key) {
+    const iv = crypto.randomBytes(16); // Generate random initialization vector (IV)
+    const cipher = crypto.createCipheriv('aes-256-gcm', crypto.scryptSync(key, 'salt', 32), iv);
+    
+    let encrypted = cipher.update(text, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+    const authTag = cipher.getAuthTag().toString('hex');
+    
+    return iv.toString('hex') + ':' + authTag + ':' + encrypted;
+}
+
+// webSocket handling
 wss.on('connection', ws => {
     ws.on('message', message => {
         try {
-            const data = JSON.parse(message);  // Parse the JSON string
+            const data = JSON.parse(message); //debugging 
 
-            // Broadcast the message to all clients
             wss.clients.forEach(client => {
                 if (client.readyState === WebSocket.OPEN) {
-                    client.send(JSON.stringify(data));  // Broadcast array as JSON
+                    client.send(JSON.stringify(data));  
                 }
             });
         } catch (error) {

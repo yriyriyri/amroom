@@ -72,7 +72,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 messages.scrollTop = messages.scrollHeight;
             });
     
-            // image source to trigger the load event
             img.src = img.src; //redundant ensure the image source is correctly set
         } else {
             // finish handling non-image messages
@@ -81,6 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
             messages.scrollTop = messages.scrollHeight;
         }
     });
+    
     
 
     function sendMessage(message) {
