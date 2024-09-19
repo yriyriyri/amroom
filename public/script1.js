@@ -58,30 +58,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
     socket.addEventListener('message', function(event) {
         const message = event.data;
-        console.log(message)
-        const decryptedMessage = decryptMessage(message, sessionKey);
-        console.log(decryptedMessage)
-        const parsedData = JSON.parse(decryptedMessage);
-        console.log(parsedData)
-
-        const listItem = document.createElement('li');
-        if (parsedData.includes('<img')) {
-            const tempContainer = document.createElement('div');
-            tempContainer.innerHTML = decryptedMessage;
-            const img = tempContainer.querySelector('img');
-            
-            img.addEventListener('load', () => {
-                listItem.innerHTML = decryptedMessage;
-                messages.appendChild(listItem);
-                messages.scrollTop = messages.scrollHeight;
+        console.log('Encrypted message:', message);
+    
+        decryptMessage(message, sessionKey)
+            .then(decryptedMessage => {
+                console.log('Decrypted message:', decryptedMessage);
+                const parsedData = JSON.parse(decryptedMessage);
+                console.log('Parsed data:', parsedData);
+    
+                const listItem = document.createElement('li');
+                
+                if (parsedData.includes('<img')) {
+                    const tempContainer = document.createElement('div');
+                    tempContainer.innerHTML = parsedData; 
+                    const img = tempContainer.querySelector('img');
+                    
+                    // Wait for the image to load before appending to the list
+                    img.addEventListener('load', () => {
+                        listItem.innerHTML = parsedData;
+                        messages.appendChild(listItem);
+                        messages.scrollTop = messages.scrollHeight; // scroll to the bottom
+                    });
+                    
+                    img.src = img.src;
+                } else {
+                    listItem.innerHTML = parsedData;
+                    messages.appendChild(listItem);
+                    messages.scrollTop = messages.scrollHeight; // scroll to the bottom
+                }
+            })
+            .catch(error => {
+                console.error('Error handling message:', error);
             });
-        
-            img.src = img.src;
-        } else {
-            listItem.innerHTML = parsedData;
-            messages.appendChild(listItem);
-            messages.scrollTop = messages.scrollHeight;
-        }
     });
     
 
@@ -413,40 +421,73 @@ document.addEventListener('DOMContentLoaded', function() {
         return username;
     }
 
+    socket.addEventListener('message', function(event) {
+        const message = event.data;
+        console.log('Encrypted message:', message);
+    
+        decryptMessage(message, sessionKey)
+            .then(decryptedMessage => {
+                console.log('Decrypted message:', decryptedMessage);
+    
+                try {
+                    const parsedData = JSON.parse(decryptedMessage);
+                    console.log('Parsed data:', parsedData);
+                    // Handle the parsed data here
+                } catch (parseError) {
+                    console.error('Error parsing decrypted message:', parseError);
+                }
+            })
+            .catch(error => {
+                console.error('Error handling message:', error);
+            });
+    });
+    
     async function decryptMessage(encryptedMessage, key) {
-        const [ivHex, authTagHex, encryptedHex] = encryptedMessage.split(':');
-        
-        // Convert hex strings to Uint8Array
-        const iv = hexToUint8Array(ivHex);
-        const authTag = hexToUint8Array(authTagHex);
-        const encrypted = hexToUint8Array(encryptedHex);
-    
-        // Import the key for decryption
-        const cryptoKey = await crypto.subtle.importKey(
-            'raw',
-            hexToUint8Array(key),
-            { name: 'AES-GCM' },
-            false,
-            ['decrypt']
-        );
-    
         try {
+            const [ivHex, authTagHex, encryptedHex] = encryptedMessage.split(':');
+            console.log('IV:', ivHex, 'Auth Tag:', authTagHex, 'Encrypted Data:', encryptedHex);
+    
+            // Convert hex strings to Uint8Array
+            const iv = hexToUint8Array(ivHex);
+            const authTag = hexToUint8Array(authTagHex);
+            const encrypted = hexToUint8Array(encryptedHex);
+    
+            console.log('IV Uint8Array:', iv, 'Auth Tag Uint8Array:', authTag, 'Encrypted Uint8Array:', encrypted);
+    
+            // Combine encrypted data with auth tag (AES-GCM expects them together)
+            const combinedData = new Uint8Array(encrypted.length + authTag.length);
+            combinedData.set(encrypted);
+            combinedData.set(authTag, encrypted.length);
+    
+            console.log('Combined Encrypted Data:', combinedData);
+    
+            // Import the key for decryption
+            const cryptoKey = await crypto.subtle.importKey(
+                'raw',
+                hexToUint8Array(key),
+                { name: 'AES-GCM' },
+                false,
+                ['decrypt']
+            );
+    
+            console.log('CryptoKey imported successfully');
+    
             // Decrypt the message
-            const decryptedArrayBuffer = await crypto.subtle.decrypt(
+            return crypto.subtle.decrypt(
                 {
                     name: 'AES-GCM',
                     iv: iv,
                     tagLength: 128
                 },
                 cryptoKey,
-                encrypted // Only pass the encrypted data, not the authTag
-            );
-    
-            // Convert ArrayBuffer to string
-            const decoder = new TextDecoder('utf-8');
-            return decoder.decode(decryptedArrayBuffer);
-        } catch (e) {
-            console.error('Decryption failed:', e);
+                combinedData // Use the combined encrypted data and auth tag
+            ).then(decryptedArrayBuffer => {
+                // Convert ArrayBuffer to string
+                const decoder = new TextDecoder('utf-8');
+                return decoder.decode(decryptedArrayBuffer);
+            });
+        } catch (error) {
+            console.error('Decryption error:', error);
             throw new Error('Decryption failed');
         }
     }
@@ -458,9 +499,9 @@ document.addEventListener('DOMContentLoaded', function() {
             arr[i / 2] = parseInt(hex.substr(i, 2), 16);
         }
         return arr;
-    }    
+    }
     
-
+    
     userInput.addEventListener('blur', function() {
         userInput.focus();
     });
