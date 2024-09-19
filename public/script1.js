@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentFont = 'Ubuntu Mono';
     let currentFontSize = 16;
     let currentText = '';
-    let sessionKey = 'default_session_key';
+    let sessionKey = 'floss2024';
     
     // web-safe fonts
     const webSafeFonts = [
@@ -411,28 +411,38 @@ document.addEventListener('DOMContentLoaded', function() {
         return username;
     }
 
-    function decryptMessage(encrypted, key) {
+    async function decryptMessage(encrypted, key) {
+        const [ivHex, authTagHex, encryptedData] = encrypted.split(':');
+        const iv = new Uint8Array(ivHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+        const authTag = new Uint8Array(authTagHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+        const encryptedArray = new Uint8Array(encryptedData.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+    
         try {
-            const [ivHex, authTagHex, encryptedData] = encrypted.split(':');
-            const iv = CryptoJS.enc.Hex.parse(ivHex);
-            const authTag = CryptoJS.enc.Hex.parse(authTagHex);
-            const decrypted = CryptoJS.AES.decrypt(
-                { ciphertext: CryptoJS.enc.Hex.parse(encryptedData) },
-                CryptoJS.enc.Utf8.parse(key), 
-                {
-                    iv: iv,
-                    mode: CryptoJS.mode.GCM,
-                    format: CryptoJS.format.Hex,
-                    tag: authTag
-                }
+            const cryptoKey = await window.crypto.subtle.importKey(
+                'raw', 
+                new TextEncoder().encode(key), // Convert key to ArrayBuffer
+                { name: 'AES-GCM' }, 
+                false, 
+                ['decrypt']
             );
     
-            return decrypted.toString(CryptoJS.enc.Utf8);
+            const decrypted = await window.crypto.subtle.decrypt(
+                {
+                    name: 'AES-GCM',
+                    iv: iv, 
+                    additionalData: authTag, // Auth Tag passed here
+                    tagLength: 128 // GCM tag length in bits
+                },
+                cryptoKey,
+                encryptedArray.buffer
+            );
+    
+            return new TextDecoder().decode(decrypted);
         } catch (error) {
             console.error('Decryption failed:', error);
             return 'Decryption failed';
         }
-    }
+    }    
     
 
     userInput.addEventListener('blur', function() {

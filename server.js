@@ -12,7 +12,7 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-const secretKey = 'default_session_key';
+const secretKey = 'Floss2024';
 
 // Middleware
 app.use(morgan('combined')); // Log HTTP requests
