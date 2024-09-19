@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentFont = 'Ubuntu Mono';
     let currentFontSize = 16;
     let currentText = '';
+    let sessionKey = 'default_session_key';
     
     // web-safe fonts
     const webSafeFonts = [
@@ -58,29 +59,28 @@ document.addEventListener('DOMContentLoaded', function() {
     socket.addEventListener('message', function(event) {
         const message = event.data;
         const parsedData = JSON.parse(message);
-        const listItem = document.createElement('li');
-        if (parsedData.includes('<img')) {
-            // temp container for image 
-            const tempContainer = document.createElement('div');
-            tempContainer.innerHTML = parsedData;
-            const img = tempContainer.querySelector('img');
+        
+        const decryptedMessage = decryptMessage(parsedData.message, sessionKey);
     
-            // load event listener to handle scroll after image load
+        const listItem = document.createElement('li');
+        if (decryptedMessage.includes('<img')) {
+            const tempContainer = document.createElement('div');
+            tempContainer.innerHTML = decryptedMessage;
+            const img = tempContainer.querySelector('img');
+            
             img.addEventListener('load', () => {
-                listItem.innerHTML = parsedData;
+                listItem.innerHTML = decryptedMessage;
                 messages.appendChild(listItem);
                 messages.scrollTop = messages.scrollHeight;
             });
-    
-            img.src = img.src; //redundant ensure the image source is correctly set
+        
+            img.src = img.src;
         } else {
-            // finish handling non-image messages
-            listItem.innerHTML = parsedData;
+            listItem.innerHTML = decryptedMessage;
             messages.appendChild(listItem);
             messages.scrollTop = messages.scrollHeight;
         }
     });
-    
     
 
     function sendMessage(message) {
@@ -410,6 +410,30 @@ document.addEventListener('DOMContentLoaded', function() {
         username = ('user-' + username)
         return username;
     }
+
+    function decryptMessage(encrypted, key) {
+        try {
+            const [ivHex, authTagHex, encryptedData] = encrypted.split(':');
+            const iv = CryptoJS.enc.Hex.parse(ivHex);
+            const authTag = CryptoJS.enc.Hex.parse(authTagHex);
+            const decrypted = CryptoJS.AES.decrypt(
+                { ciphertext: CryptoJS.enc.Hex.parse(encryptedData) },
+                CryptoJS.enc.Utf8.parse(key), 
+                {
+                    iv: iv,
+                    mode: CryptoJS.mode.GCM,
+                    format: CryptoJS.format.Hex,
+                    tag: authTag
+                }
+            );
+    
+            return decrypted.toString(CryptoJS.enc.Utf8);
+        } catch (error) {
+            console.error('Decryption failed:', error);
+            return 'Decryption failed';
+        }
+    }
+    
 
     userInput.addEventListener('blur', function() {
         userInput.focus();

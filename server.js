@@ -39,7 +39,7 @@ app.get('/', (req, res) => {
 });
 
 function encrypt(text, key) {
-    const iv = crypto.randomBytes(16); // Generate random initialization vector (IV)
+    const iv = crypto.randomBytes(16); // generate random initialization vector (IV)
     const cipher = crypto.createCipheriv('aes-256-gcm', crypto.scryptSync(key, 'salt', 32), iv);
     
     let encrypted = cipher.update(text, 'utf8', 'hex');
@@ -55,9 +55,11 @@ wss.on('connection', ws => {
         try {
             const data = JSON.parse(message); //debugging 
 
+            const encryptedMessage = encrypt(JSON.stringify(data), secretKey);
+
             wss.clients.forEach(client => {
                 if (client.readyState === WebSocket.OPEN) {
-                    client.send(JSON.stringify(data));  
+                    client.send(JSON.stringify({ message: encryptedMessage }));
                 }
             });
         } catch (error) {
