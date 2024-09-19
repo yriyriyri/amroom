@@ -59,7 +59,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const message = event.data;
         const parsedData = JSON.parse(message);
         const listItem = document.createElement('li');
-    
         if (parsedData.includes('<img')) {
             // temp container for image 
             const tempContainer = document.createElement('div');
