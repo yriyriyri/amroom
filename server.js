@@ -12,7 +12,7 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-const secretKey = 'Floss2024';
+const secretKey = '00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff';
 
 // Middleware
 app.use(morgan('combined')); // Log HTTP requests
@@ -39,13 +39,13 @@ app.get('/', (req, res) => {
 });
 
 function encrypt(text, key) {
-    const iv = crypto.randomBytes(16); // generate random initialization vector (IV)
-    const cipher = crypto.createCipheriv('aes-256-gcm', crypto.scryptSync(key, 'salt', 32), iv);
-    
+    const iv = crypto.randomBytes(12); // AES-GCM requires 12 bytes IV
+    const cipher = crypto.createCipheriv('aes-256-gcm', Buffer.from(key, 'hex'), iv);
+
     let encrypted = cipher.update(text, 'utf8', 'hex');
     encrypted += cipher.final('hex');
     const authTag = cipher.getAuthTag().toString('hex');
-    
+
     return iv.toString('hex') + ':' + authTag + ':' + encrypted;
 }
 
@@ -53,13 +53,13 @@ function encrypt(text, key) {
 wss.on('connection', ws => {
     ws.on('message', message => {
         try {
-            const data = JSON.parse(message); //debugging 
+            const data = JSON.parse(message); // Debugging 
 
             const encryptedMessage = encrypt(JSON.stringify(data), secretKey);
 
             wss.clients.forEach(client => {
                 if (client.readyState === WebSocket.OPEN) {
-                    client.send(JSON.stringify({ message: encryptedMessage }));
+                    client.send(encryptedMessage); // No need to wrap in JSON.stringify
                 }
             });
         } catch (error) {
@@ -67,6 +67,7 @@ wss.on('connection', ws => {
         }
     });
 });
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {

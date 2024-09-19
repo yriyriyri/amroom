@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentFont = 'Ubuntu Mono';
     let currentFontSize = 16;
     let currentText = '';
-    let sessionKey = 'floss2024';
+    let sessionKey = '00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff';
     
     // web-safe fonts
     const webSafeFonts = [
@@ -58,12 +58,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     socket.addEventListener('message', function(event) {
         const message = event.data;
-        const parsedData = JSON.parse(message);
-        
-        const decryptedMessage = decryptMessage(parsedData.message, sessionKey);
-    
+        console.log(message)
+        const decryptedMessage = decryptMessage(message, sessionKey);
+        console.log(decryptedMessage)
+        const parsedData = JSON.parse(decryptedMessage);
+        console.log(parsedData)
+
         const listItem = document.createElement('li');
-        if (decryptedMessage.includes('<img')) {
+        if (parsedData.includes('<img')) {
             const tempContainer = document.createElement('div');
             tempContainer.innerHTML = decryptedMessage;
             const img = tempContainer.querySelector('img');
@@ -76,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
             img.src = img.src;
         } else {
-            listItem.innerHTML = decryptedMessage;
+            listItem.innerHTML = parsedData;
             messages.appendChild(listItem);
             messages.scrollTop = messages.scrollHeight;
         }
@@ -411,37 +413,51 @@ document.addEventListener('DOMContentLoaded', function() {
         return username;
     }
 
-    async function decryptMessage(encrypted, key) {
-        const [ivHex, authTagHex, encryptedData] = encrypted.split(':');
-        const iv = new Uint8Array(ivHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
-        const authTag = new Uint8Array(authTagHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
-        const encryptedArray = new Uint8Array(encryptedData.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+    async function decryptMessage(encryptedMessage, key) {
+        const [ivHex, authTagHex, encryptedHex] = encryptedMessage.split(':');
+        
+        // Convert hex strings to Uint8Array
+        const iv = hexToUint8Array(ivHex);
+        const authTag = hexToUint8Array(authTagHex);
+        const encrypted = hexToUint8Array(encryptedHex);
+    
+        // Import the key for decryption
+        const cryptoKey = await crypto.subtle.importKey(
+            'raw',
+            hexToUint8Array(key),
+            { name: 'AES-GCM' },
+            false,
+            ['decrypt']
+        );
     
         try {
-            const cryptoKey = await window.crypto.subtle.importKey(
-                'raw', 
-                new TextEncoder().encode(key), // Convert key to ArrayBuffer
-                { name: 'AES-GCM' }, 
-                false, 
-                ['decrypt']
-            );
-    
-            const decrypted = await window.crypto.subtle.decrypt(
+            // Decrypt the message
+            const decryptedArrayBuffer = await crypto.subtle.decrypt(
                 {
                     name: 'AES-GCM',
-                    iv: iv, 
-                    additionalData: authTag, // Auth Tag passed here
-                    tagLength: 128 // GCM tag length in bits
+                    iv: iv,
+                    tagLength: 128
                 },
                 cryptoKey,
-                encryptedArray.buffer
+                encrypted // Only pass the encrypted data, not the authTag
             );
     
-            return new TextDecoder().decode(decrypted);
-        } catch (error) {
-            console.error('Decryption failed:', error);
-            return 'Decryption failed';
+            // Convert ArrayBuffer to string
+            const decoder = new TextDecoder('utf-8');
+            return decoder.decode(decryptedArrayBuffer);
+        } catch (e) {
+            console.error('Decryption failed:', e);
+            throw new Error('Decryption failed');
         }
+    }
+    
+    function hexToUint8Array(hex) {
+        const len = hex.length;
+        const arr = new Uint8Array(len / 2);
+        for (let i = 0; i < len; i += 2) {
+            arr[i / 2] = parseInt(hex.substr(i, 2), 16);
+        }
+        return arr;
     }    
     
 
