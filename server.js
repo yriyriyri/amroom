@@ -9,10 +9,11 @@ const helmet = require('helmet');
 const crypto = require('crypto');
 
 const app = express();
+app.use(express.json());
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-const secretKey = '00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff';
+const secretKey = process.env.SECRET_KEY;
 
 // Middleware
 app.use(morgan('combined')); // Log HTTP requests
@@ -48,6 +49,17 @@ function encrypt(text, key) {
 
     return iv.toString('hex') + ':' + authTag + ':' + encrypted;
 }
+
+app.post('/check-key', (req, res) => {
+    const { parameter } = req.body;
+
+    // Check if the parameter matches the secret key
+    const keysMatch = parameter === secretKey;
+
+    // Respond with true or false
+    return res.status(200).json({ match: keysMatch });
+});
+
 
 // webSocket handling
 wss.on('connection', ws => {

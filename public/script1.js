@@ -66,8 +66,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('Decrypted message:', decryptedMessage);
                 if (decryptedMessage == 'Failed Decrypt'){
                     const hiddenUserOutput = `<span style="color: #000000; font-family: Ubuntu Mono; font-size: 16px;">${message}</span>`;
+                    const warning = `<span style="color: #ff0000; font-family: Ubuntu Mono; font-size: 16px;">Session key invalid, cannot decrypt: Change session key</span>`;
                     const listItem = document.createElement('li');
-                    listItem.innerHTML = `${promptHiddenUser}${promptLocation}${promptBling}${hiddenUserOutput}`;
+                    listItem.innerHTML = `${promptHiddenUser}${promptLocation}${promptBling}${hiddenUserOutput}${warning}`;
                     messages.appendChild(listItem);
                     messages.scrollTop = messages.scrollHeight;
                 }else{
@@ -101,8 +102,14 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
 
-    function sendMessage(message) {
-        socket.send(JSON.stringify(message));
+    async function sendMessage(message, parameter) {
+        const isKeyValid = await checkKey(parameter);
+    
+        if (isKeyValid) {
+            socket.send(JSON.stringify(message));
+        } else {
+            printCmdResponse('Invalid session key: can not send message')
+        }
     }
     
     userInput.focus();
@@ -166,7 +173,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     promptUser = `<span class="prompt-user" style="color: ${currentUserColor};">mainroom@${currentUsername}:</span>`;
                     listItem.innerHTML = `${hiddenChar}${promptUser}${promptLocation}${promptBling}${InputText}`;
                     innerHTMLString = '${hiddenChar}${promptUser}${promptLocation}${promptBling}${InputText}';
-                    sendMessage(listItem.innerHTML)
+                    sendMessage(listItem.innerHTML,sessionKey)
                 } else {
                     const listItem = document.createElement('li');
                     const InputText = `<span style="color: #880000; font-family: Ubuntu Mono; font-size: 16px;">${inputText}</span>`;
@@ -259,8 +266,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     printCmdResponse(`Invalid image URL: ${arguments}`);
                 }
                 break;
-            case 'decrypt':
-                decryptKey(arguments);
+            case 'sessionkey':
+                sessionKeyChange(arguments);
                 break;
             default:
                 printCmdResponse(`Unknown command: ${cmd}`);
@@ -358,10 +365,10 @@ document.addEventListener('DOMContentLoaded', function() {
             listItem.innerHTML = `${hiddenChar}${promptUser}${promptLocation}${promptBling}${imageElement}`;
             
             if (activeTerminal === 'terminal') {
-                sendMessage(listItem.innerHTML);
+                sendMessage(listItem.innerHTML,sessionKey);
                 messages.scrollTop = messages.scrollHeight;
             } else {
-                sendMessage(listItem.innerHTML);
+                sendMessage(listItem.innerHTML,sessionKey);
                 messages.scrollTop = messages.scrollHeight;
             }
         });
@@ -374,11 +381,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const linkElement = `<a href="${url}" class="link" target="_blank">${url}</a>`;
         listItem.innerHTML = `${hiddenChar}${promptUser}${promptLocation}${promptBling}${linkElement}`;
         if (activeTerminal === 'terminal'){
-            sendMessage(listItem.innerHTML)
+            sendMessage(listItem.innerHTML,sessionKey)
             messages.scrollTop = messages.scrollHeight;
         }
         else{
-            sendMessage(listItem.innerHTML)
+            sendMessage(listItem.innerHTML,sessionKey)
             messages.scrollTop = messages.scrollHeight;
         }
     }    
@@ -400,7 +407,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function decryptKey(key) {
+    function sessionKeyChange(key) {
         sessionKey = key
     }
 
@@ -486,6 +493,29 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    async function checkKey(parameter) {
+        try {
+            const response = await fetch('http://localhost:3000/check-key', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ parameter })
+            });
+    
+            // Check if the response is ok (status in the range 200-299)
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+    
+            const data = await response.json();
+            return data.match; // This will be true or false based on the response
+        } catch (error) {
+            console.error('Error:', error);
+            return false; // Return false in case of an error
+        }
+    }
+
     function hexToUint8Array(hex) {
         const len = hex.length;
         const arr = new Uint8Array(len / 2);
