@@ -274,6 +274,10 @@ body {
   color: #880000; 
 }
 
+.prompt-hidden-user {
+  color: #ba0000; 
+}
+
 .prompt-location {
   color: #063267; 
 }

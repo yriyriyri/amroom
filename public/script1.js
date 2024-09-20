@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const promptLocation = '<span class="prompt-location">~</span>';
     const promptBling = '<span class="prompt-bling">$</span>';
     const promptAdmin = '<span class="prompt-admin">encryptedchatroooom@console</span>';
+    const promptHiddenUser =  '<span class="prompt-hidden-user">encryptedchatroooom@hidden-user</span>';
     const terminalBar = document.getElementById('terminal__bar');
     const terminalBarConsole = document.getElementById('terminal__bar-console')
     const terminal = document.getElementById('terminal');
@@ -63,30 +64,37 @@ document.addEventListener('DOMContentLoaded', function() {
         decryptMessage(message, sessionKey)
             .then(decryptedMessage => {
                 console.log('Decrypted message:', decryptedMessage);
-                const parsedData = JSON.parse(decryptedMessage);
-                console.log('Parsed data:', parsedData);
-    
-                const listItem = document.createElement('li');
-                
-                if (parsedData.includes('<img')) {
-                    const tempContainer = document.createElement('div');
-                    tempContainer.innerHTML = parsedData; 
-                    const img = tempContainer.querySelector('img');
+                if (decryptedMessage == 'Failed Decrypt'){
+                    const hiddenUserOutput = `<span style="color: #000000; font-family: Ubuntu Mono; font-size: 16px;">${message}</span>`;
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `${promptHiddenUser}${promptLocation}${promptBling}${hiddenUserOutput}`;
+                    messages.appendChild(listItem);
+                    messages.scrollTop = messages.scrollHeight;
+                }else{
+                    const parsedData = JSON.parse(decryptedMessage);
+                    console.log('Parsed data:', parsedData);
+        
+                    const listItem = document.createElement('li');
                     
-                    // Wait for the image to load before appending to the list
-                    img.addEventListener('load', () => {
+                    if (parsedData.includes('<img')) {
+                        const tempContainer = document.createElement('div');
+                        tempContainer.innerHTML = parsedData; 
+                        const img = tempContainer.querySelector('img');
+                        
+                        // Wait for the image to load before appending to the list
+                        img.addEventListener('load', () => {
+                            listItem.innerHTML = parsedData;
+                            messages.appendChild(listItem);
+                            messages.scrollTop = messages.scrollHeight; // scroll to the bottom
+                        });
+                        
+                        img.src = img.src;
+                    } else {
                         listItem.innerHTML = parsedData;
                         messages.appendChild(listItem);
                         messages.scrollTop = messages.scrollHeight; // scroll to the bottom
-                    });
-                    
-                    img.src = img.src;
-                } else {
-                    listItem.innerHTML = parsedData;
-                    messages.appendChild(listItem);
-                    messages.scrollTop = messages.scrollHeight; // scroll to the bottom
-                }
-            })
+                    }
+                }})
             .catch(error => {
                 console.error('Error handling message:', error);
             });
@@ -251,6 +259,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     printCmdResponse(`Invalid image URL: ${arguments}`);
                 }
                 break;
+            case 'decrypt':
+                decryptKey(arguments);
+                break;
             default:
                 printCmdResponse(`Unknown command: ${cmd}`);
                 break;
@@ -389,6 +400,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function decryptKey(key) {
+        sessionKey = key
+    }
+
     function onMouseUp() {
         isDragging = false;
         draggingTerminal = null;  
@@ -420,48 +435,27 @@ document.addEventListener('DOMContentLoaded', function() {
         username = ('user-' + username)
         return username;
     }
-
-    socket.addEventListener('message', function(event) {
-        const message = event.data;
-        console.log('Encrypted message:', message);
-    
-        decryptMessage(message, sessionKey)
-            .then(decryptedMessage => {
-                console.log('Decrypted message:', decryptedMessage);
-    
-                try {
-                    const parsedData = JSON.parse(decryptedMessage);
-                    console.log('Parsed data:', parsedData);
-                    // Handle the parsed data here
-                } catch (parseError) {
-                    console.error('Error parsing decrypted message:', parseError);
-                }
-            })
-            .catch(error => {
-                console.error('Error handling message:', error);
-            });
-    });
     
     async function decryptMessage(encryptedMessage, key) {
         try {
             const [ivHex, authTagHex, encryptedHex] = encryptedMessage.split(':');
             console.log('IV:', ivHex, 'Auth Tag:', authTagHex, 'Encrypted Data:', encryptedHex);
     
-            // Convert hex strings to Uint8Array
+            // convert hex strings to Uint8Array
             const iv = hexToUint8Array(ivHex);
             const authTag = hexToUint8Array(authTagHex);
             const encrypted = hexToUint8Array(encryptedHex);
     
             console.log('IV Uint8Array:', iv, 'Auth Tag Uint8Array:', authTag, 'Encrypted Uint8Array:', encrypted);
     
-            // Combine encrypted data with auth tag (AES-GCM expects them together)
+            // combine encrypted data with auth tag (AES-GCM expects them together)
             const combinedData = new Uint8Array(encrypted.length + authTag.length);
             combinedData.set(encrypted);
             combinedData.set(authTag, encrypted.length);
     
             console.log('Combined Encrypted Data:', combinedData);
     
-            // Import the key for decryption
+            // import the key for decryption
             const cryptoKey = await crypto.subtle.importKey(
                 'raw',
                 hexToUint8Array(key),
@@ -472,7 +466,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
             console.log('CryptoKey imported successfully');
     
-            // Decrypt the message
+            // decrypt the message
             return crypto.subtle.decrypt(
                 {
                     name: 'AES-GCM',
@@ -488,7 +482,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         } catch (error) {
             console.error('Decryption error:', error);
-            throw new Error('Decryption failed');
+            return 'Failed Decrypt'
         }
     }
     
@@ -500,7 +494,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         return arr;
     }
-    
     
     userInput.addEventListener('blur', function() {
         userInput.focus();
