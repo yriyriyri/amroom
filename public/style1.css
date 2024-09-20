@@ -34,8 +34,8 @@ body {
   position: absolute;
   width: 50vw;  
   height: 40vh;  
-  left: 100;
-  top: 100;
+  left: 700px;
+  top: 400px;
   box-shadow: 2px 4px 10px rgba(0,0,0,0.5);
   z-index:  2;
 } 
@@ -162,10 +162,10 @@ body {
 } 
 @keyframes consoleblink {  
   0% {    
-    background: #880000;  
+    background: #003838;  
   }  
   49% {    
-    background: #880000;  
+    background: #003838;  
   }  
   60% {    
     background: transparent;  
@@ -173,7 +173,7 @@ body {
   99% {    
     background: transparent;  
   }  100% {    
-    background: #880000;  
+    background: #003838;  
   }
 } 
 @media (max-width: 600px) {  
@@ -271,7 +271,7 @@ body {
 }
 
 .prompt-admin {
-  color: #880000; 
+  color: #003838; 
 }
 
 .prompt-hidden-user {

@@ -53,6 +53,9 @@ document.addEventListener('DOMContentLoaded', function() {
     let activeTerminal = 'terminalConsole';
     let hiddenChar = `<span style="font-size: ${currentFontSize}px; font-family: ${currentFont}"></span>`;
     
+    openingscreen()
+    help()
+
     writingMessage.innerHTML = `${hiddenChar}${promptUser}${promptLocation}${promptBling}`;
     writingMessageConsole.innerHTML = `${promptAdmin}${promptLocation}${promptBling}${consoleCursor}`;
 
@@ -151,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
             writingMessage.innerHTML = `${hiddenChar}${promptUser}${promptLocation}${promptBling}${currentText}${cursor}`;
         }
         else {
-            currentText = `<span style="color: #880000; font-family: Ubuntu Mono; font-size: 16px;">${userInput.value}</span>`;
+            currentText = `<span style="color: #005353; font-family: Ubuntu Mono; font-size: 16px;">${userInput.value}</span>`;
             writingMessageConsole.innerHTML = `${promptAdmin}${promptLocation}${promptBling}${currentText}${consoleCursor}`;
         }
     });
@@ -176,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     sendMessage(listItem.innerHTML,sessionKey)
                 } else {
                     const listItem = document.createElement('li');
-                    const InputText = `<span style="color: #880000; font-family: Ubuntu Mono; font-size: 16px;">${inputText}</span>`;
+                    const InputText = `<span style="color: #005353; font-family: Ubuntu Mono; font-size: 16px;">${inputText}</span>`;
                     listItem.innerHTML = `${promptAdmin}${promptLocation}${promptBling}${InputText}`;
                     consoleMessages.appendChild(listItem);
                 }
@@ -206,12 +209,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         switch (cmd) {
             case 'help':
-                printCmdResponse('Help command received');
+                help()
                 break;
             case 'clear':
                 messages.innerHTML = ''; // clear the messages list
                 break;
-            case 'color':
+            case 'textcolor':
                 if (isValidHexColor(arguments)) {
                     applyColor(arguments);
                 } else {
@@ -273,6 +276,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 printCmdResponse(`Unknown command: ${cmd}`);
                 break;
         }
+    }
+
+    function help(){
+        printCmdResponse(
+            'Available commands:\n' +
+            '1. /help - Display this help message.\n' +
+            '2. /sessionkey <key> - Change the session key to the specified value.\n' +
+            '3. /clear - Clear the messages list.\n' +
+            '4. /username <name> - Set the username to the specified name.\n' +
+            '5. /usercolor <hex> - Change the user text color to the specified hex code.\n' +
+            '6. /textcolor <hex> - Change the text color to the specified hex code.\n' +
+            '7. /font <font-name> - Change the font to the specified name.\n' +
+            '8. /fontsize <size> - Change the font size to the specified value.\n' +
+            '9. /fontlist - Display a list of available fonts.\n' +
+            '10./image <url> - Display an image from the specified URL.\n' +
+            '11./link <url> - Display a hyperlink to the specified URL.\n' +
+            '12./background <url> - Change the background image to the specified URL.'
+        );
     }
     
     function isValidHexColor(color) {
@@ -354,27 +375,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function displayImage(url) {
         const listItem = document.createElement('li');
-        const imageElement = `<img src="${url}" alt="User Image" style="max-width: 100%; height: auto;" />`;
+        const maxSize = 500; 
+    
+        const imageElement = `<img src="${url}" alt="User Image" style="max-width: ${maxSize}px; max-height: ${maxSize}px; height: auto; width: auto;" />`;
     
         const tempContainer = document.createElement('div');
         tempContainer.innerHTML = imageElement;
         const img = tempContainer.querySelector('img');
     
         img.addEventListener('load', () => {
-            promptUser = `<span class="prompt-user" style="color: ${currentUserColor};">mainroom@${currentUsername}:</span>`;
+            const promptUser = `<span class="prompt-user" style="color: ${currentUserColor};">mainroom@${currentUsername}:</span>`;
             listItem.innerHTML = `${hiddenChar}${promptUser}${promptLocation}${promptBling}${imageElement}`;
-            
-            if (activeTerminal === 'terminal') {
-                sendMessage(listItem.innerHTML,sessionKey);
-                messages.scrollTop = messages.scrollHeight;
-            } else {
-                sendMessage(listItem.innerHTML,sessionKey);
-                messages.scrollTop = messages.scrollHeight;
-            }
+    
+            sendMessage(listItem.innerHTML, sessionKey);
+            messages.scrollTop = messages.scrollHeight;
         });
     
         img.src = url;
     }
+    
     
     function displayLink(url) {
         const listItem = document.createElement('li');
@@ -392,7 +411,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function printCmdResponse(command) {
         const listItem = document.createElement('li');
-        const CommandOutput = `<span style="color: #880000; font-family: Ubuntu Mono; font-size: 16px;">${command}</span>`;
+        const CommandOutput = `<span style="color: #005353; font-family: Ubuntu Mono; font-size: 16px;">${command}</span>`;
         listItem.innerHTML = `${promptAdmin}${promptLocation}${promptBling}${CommandOutput}`;
         consoleMessages.appendChild(listItem);
         setTimeout(() => {
@@ -523,6 +542,26 @@ document.addEventListener('DOMContentLoaded', function() {
             arr[i / 2] = parseInt(hex.substr(i, 2), 16);
         }
         return arr;
+    }
+
+    function openingscreen() {
+        const openingscreenstring = 
+            `   _____                 .__  .__                __________                                   
+      /  _  \\   _____   ____ |  | |__| ____   ______ \\______   \\ ____   ____   _____              
+     /  /_\\  \\ /     \\_/ __ \\|  | |  |/ __ \\ /  ___/  |       _//  _ \\ /  _ \\ /     \\             
+    /    |    \\  Y Y  \\  ___/|  |_|  \\  ___/ \\___ \\   |    |   (  <_> |  <_> )  Y Y  \\            
+    \\____|__  /__|_|  /\\___  >____/__|\\___  >____  >  |____|_  /\\____/ \\____/|__|_|  / /\\  /\\  /\\ 
+            \\/      \\/     \\/             \\/     \\/          \\/                    \\/  \\/  \\/  \\/ 
+                                                                                             
+    1> For commands /help in the console.\n
+    2> You won't be able to see message content or send messages unless you have the session key. You can /sessionkey in the console to enter your key.\n
+    3> Move + Change active window with the title bar`;
+    
+        const span = document.createElement('span');
+        span.style.color = '#ff00ff';
+        span.textContent = openingscreenstring;
+    
+        messages.appendChild(span);
     }
     
     userInput.addEventListener('blur', function() {

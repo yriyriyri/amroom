@@ -11,7 +11,18 @@ const crypto = require('crypto');
 const app = express();
 app.use(express.json());
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+
+const wss = new WebSocket.Server({ 
+    server,
+    verifyClient: (info, callback) => {
+        const origin = info.origin;
+        if (allowedOrigins.includes(origin)) {
+            callback(true); // Accept the connection
+        } else {
+            callback(false, 401, 'Unauthorized'); // Reject the connection
+        }
+    }
+});
 
 const secretKey = process.env.SECRET_KEY;
 
@@ -23,13 +34,25 @@ app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
-            scriptSrc: ["'self'", "'unsafe-inline'"],  // Allow inline scripts if necessary
+            scriptSrc: ["'self'"],  // Allow inline scripts if necessary
             styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],  // Allow external styles and inline styles
             fontSrc: ["'self'", "https://fonts.gstatic.com"],  // Allow font sources from Google Fonts
             imgSrc: ["*"],  // Allow images from any source
         },
     },
 }));
+
+app.use((req, res, next) => {
+    // Check if the app is running in production (e.g., on Heroku)
+    if (process.env.NODE_ENV === 'production') {
+        // If not HTTPS, redirect to HTTPS
+        if (req.header('x-forwarded-proto') !== 'https') {
+            return res.redirect(`https://${req.header('host')}${req.url}`);
+        }
+    }
+    // Proceed to the next middleware for development and for HTTPS requests
+    next();
+});
 
 // serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
