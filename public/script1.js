@@ -29,6 +29,9 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentFontSize = 16;
     let currentText = '';
     let sessionKey = 'default_session_key';
+    let isKeyValid = false;
+    let lastKeyChangeTime = 0;
+    const keyChangeDelay = 10000; // 2 seconds
     
     // web-safe fonts
     const webSafeFonts = [
@@ -67,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
         decryptMessage(message, sessionKey)
             .then(decryptedMessage => {
-                console.log('Decrypted message:', decryptedMessage);
+                // console.log('Decrypted message:', decryptedMessage);
                 if (decryptedMessage == 'Failed Decrypt'){
                     const hiddenUserOutput = `<span style="color: #000000; font-family: Ubuntu Mono; font-size: 16px;">${message}</span>`;
                     const warning = `<span style="color: #ff0000; font-family: Ubuntu Mono; font-size: 16px;">Session key invalid, cannot decrypt: Change session key</span>`;
@@ -77,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     messages.scrollTop = messages.scrollHeight;
                 }else{
                     const parsedData = JSON.parse(decryptedMessage);
-                    console.log('Parsed data:', parsedData);
+                    // console.log('Parsed data:', parsedData);
         
                     const listItem = document.createElement('li');
                     
@@ -107,9 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
 
     async function sendMessage(message, parameter) {
-        const isKeyValid = await checkKey(parameter);
-    
-        if (isKeyValid) {
+        if (parameter) {
             const sanitizedMessage = sanitizeInput(message);
             socket.send(JSON.stringify(sanitizedMessage));
         } else {
@@ -177,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const InputText = `<span style="color: ${currentColor}; font-family: ${currentFont}; font-size: ${currentFontSize};">${sanitizeInput(inputText)}</span>`;
                     promptUser = `<span class="prompt-user" style="color: ${currentUserColor};">mainroom@${currentUsername}:</span>`;
                     listItem.innerHTML = `${hiddenChar}${promptUser}${promptLocation}${promptBling}${InputText}`;
-                    sendMessage(listItem.innerHTML,sessionKey)
+                    sendMessage(listItem.innerHTML,isKeyValid)
                 } else {
                     const listItem = document.createElement('li');
                     const InputText = `<span style="color: #005353; font-family: Ubuntu Mono; font-size: 16px;">${sanitizeInput(inputText)}</span>`;
@@ -317,7 +318,6 @@ document.addEventListener('DOMContentLoaded', function() {
         messages.appendChild(span);
     }
     
-
     function isValidHexColor(color) {
         return /^#[0-9A-Fa-f]{6}$/.test(color);
     }
@@ -332,8 +332,14 @@ document.addEventListener('DOMContentLoaded', function() {
         return !isNaN(parsedSize) && parsedSize > 6 && parsedSize < 31;
     }
 
+
     function isValidImageUrl(url) {
-        return /^(http|https):\/\/[^ "]+$/.test(url);
+        const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
+        const urlObj = new URL(url);
+        const fileExtension = urlObj.pathname.split('.').pop().toLowerCase();
+        
+        // check if the URL ends with a valid image extension
+        return imageExtensions.includes(fileExtension);
     }
 
     function isValidUrl(url) {
@@ -398,8 +404,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function displayImage(url) {
         const listItem = document.createElement('li');
         const maxSize = 500; 
+
+        const sanitizedUrl = sanitizeInput(url);
     
-        const imageElement = `<img src="${url}" alt="User Image" style="max-width: ${maxSize}px; max-height: ${maxSize}px; height: auto; width: auto;" />`;
+        const imageElement = `<img src="${sanitizedUrl}" alt="User Image" style="max-width: ${maxSize}px; max-height: ${maxSize}px; height: auto; width: auto;" />`;
     
         const tempContainer = document.createElement('div');
         tempContainer.innerHTML = imageElement;
@@ -409,24 +417,24 @@ document.addEventListener('DOMContentLoaded', function() {
             const promptUser = `<span class="prompt-user" style="color: ${currentUserColor};">mainroom@${currentUsername}:</span>`;
             listItem.innerHTML = `${hiddenChar}${promptUser}${promptLocation}${promptBling}${imageElement}`;
     
-            sendMessage(listItem.innerHTML, sessionKey);
+            sendMessage(listItem.innerHTML, isKeyValid);
             messages.scrollTop = messages.scrollHeight;
         });
     
         img.src = url;
     }
-    
-    
+     
     function displayLink(url) {
         const listItem = document.createElement('li');
-        const linkElement = `<a href="${url}" class="link" target="_blank">${url}</a>`;
+        const sanitizedUrl = sanitizeInput(url);
+        const linkElement = `<a href="${sanitizedUrl}" class="link" target="_blank">${sanitizedUrl}</a>`;
         listItem.innerHTML = `${hiddenChar}${promptUser}${promptLocation}${promptBling}${linkElement}`;
         if (activeTerminal === 'terminal'){
-            sendMessage(listItem.innerHTML,sessionKey)
+            sendMessage(listItem.innerHTML,isKeyValid)
             messages.scrollTop = messages.scrollHeight;
         }
         else{
-            sendMessage(listItem.innerHTML,sessionKey)
+            sendMessage(listItem.innerHTML,isKeyValid)
             messages.scrollTop = messages.scrollHeight;
         }
     }    
@@ -448,10 +456,25 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function sessionKeyChange(key) {
-        sessionKey = key
-    }
+    async function sessionKeyChange(key) {
+        const now = Date.now();
+        if (now - lastKeyChangeTime < keyChangeDelay) {
+            printCmdResponse('Please wait before changing the key again.');
+            return;
+        }
 
+        lastKeyChangeTime = now; // Update the last change time
+        sessionKey = key;
+        isKeyValid = await checkKey(key);
+
+        if (isKeyValid) {
+            isKeyValid = true
+            printCmdResponse('Key is valid');
+        } else {
+            isKeyValid = false
+            printCmdResponse('Key is invalid');
+        }
+    }
     function onMouseUp() {
         isDragging = false;
         draggingTerminal = null;  
@@ -491,21 +514,21 @@ document.addEventListener('DOMContentLoaded', function() {
     async function decryptMessage(encryptedMessage, key) {
         try {
             const [ivHex, authTagHex, encryptedHex] = encryptedMessage.split(':');
-            console.log('IV:', ivHex, 'Auth Tag:', authTagHex, 'Encrypted Data:', encryptedHex);
+            // console.log('IV:', ivHex, 'Auth Tag:', authTagHex, 'Encrypted Data:', encryptedHex);
     
             // convert hex strings to Uint8Array
             const iv = hexToUint8Array(ivHex);
             const authTag = hexToUint8Array(authTagHex);
             const encrypted = hexToUint8Array(encryptedHex);
     
-            console.log('IV Uint8Array:', iv, 'Auth Tag Uint8Array:', authTag, 'Encrypted Uint8Array:', encrypted);
+            // console.log('IV Uint8Array:', iv, 'Auth Tag Uint8Array:', authTag, 'Encrypted Uint8Array:', encrypted);
     
             // combine encrypted data with auth tag (AES-GCM expects them together)
             const combinedData = new Uint8Array(encrypted.length + authTag.length);
             combinedData.set(encrypted);
             combinedData.set(authTag, encrypted.length);
     
-            console.log('Combined Encrypted Data:', combinedData);
+            // console.log('Combined Encrypted Data:', combinedData);
     
             // import the key for decryption
             const cryptoKey = await crypto.subtle.importKey(
@@ -516,7 +539,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 ['decrypt']
             );
     
-            console.log('CryptoKey imported successfully');
+            // console.log('CryptoKey imported successfully');
     
             // decrypt the message
             return crypto.subtle.decrypt(
@@ -560,6 +583,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return false; // Return false in case of an error
         }
     }
+
 
     function hexToUint8Array(hex) {
         const len = hex.length;

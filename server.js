@@ -7,12 +7,20 @@ const path = require('path');
 const morgan = require('morgan');
 const helmet = require('helmet');
 const crypto = require('crypto');
+const rateLimit = require('express-rate-limit');
+const fs = require('fs'); // for logging into a file
 
 const allowedOrigins = ['http://your-allowed-origin.com', 'http://localhost:3000'];
 const secretKey = process.env.SECRET_KEY;
 
 const app = express();
 const server = http.createServer(app);
+
+const limiter = rateLimit({
+    windowMs: 1 * 60 * 1000, // 1 minute
+    max: 5, // Limit each IP to 5 requests per windowMs
+    message: { error: 'Too many attempts, please try again later.' }
+});
 
 // Middleware
 app.use(morgan('combined')); // Log HTTP requests
@@ -29,7 +37,6 @@ app.use(helmet({
         },
     },
 }));
-
 
 app.use(express.json());
 
@@ -62,6 +69,15 @@ const wss = new WebSocket.Server({
     }
 });
 
+function logInvalidAttempt(ip, origin, parameter) {
+    const logMessage = `${new Date().toISOString()} - Invalid attempt from IP: ${ip}, Origin: ${origin}, Key: ${parameter}\n`;
+    
+    // Write the log to a file (appends to the file if it exists)
+    fs.appendFile('invalid_attempts.log', logMessage, (err) => {
+        if (err) console.error('Error logging invalid attempt:', err);
+    });
+}
+
 function encrypt(text, key) {
     const iv = crypto.randomBytes(12); // AES-GCM requires 12 bytes IV
     const cipher = crypto.createCipheriv('aes-256-gcm', Buffer.from(key, 'hex'), iv);
@@ -73,15 +89,25 @@ function encrypt(text, key) {
     return iv.toString('hex') + ':' + authTag + ':' + encrypted;
 }
 
-app.post('/check-key', (req, res) => {
+app.post('/check-key', limiter, (req, res) => {
+    const origin = req.get('origin');
+    const ip = req.ip || req.connection.remoteAddress;
     const { parameter } = req.body;
 
-    // Check if the parameter matches the secret key
+    if (!allowedOrigins.includes(origin)) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    // Check if the session key matches
     const keysMatch = parameter === secretKey;
 
-    // Respond with true or false
+    if (!keysMatch) {
+        logInvalidAttempt(ip, origin, parameter); // Log the invalid attempt
+    }
+
     return res.status(200).json({ match: keysMatch });
 });
+
 
 // webSocket handling
 wss.on('connection', ws => {
