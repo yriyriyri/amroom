@@ -8,9 +8,47 @@ const morgan = require('morgan');
 const helmet = require('helmet');
 const crypto = require('crypto');
 
+const allowedOrigins = ['http://your-allowed-origin.com', 'http://localhost:3000'];
+const secretKey = process.env.SECRET_KEY;
+
 const app = express();
-app.use(express.json());
 const server = http.createServer(app);
+
+// Middleware
+app.use(morgan('combined')); // Log HTTP requests
+app.use(helmet()); // Secure HTTP headers
+
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "https://cdnjs.cloudflare.com"],  // Allow scripts from self and Cloudflare
+            styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],  // Allow external styles and inline styles
+            fontSrc: ["'self'", "https://fonts.gstatic.com"],  // Allow font sources from Google Fonts
+            imgSrc: ["*"],  // Allow images from any source
+        },
+    },
+}));
+
+
+app.use(express.json());
+
+// HTTPS Redirect Middleware
+app.use((req, res, next) => {
+    if (process.env.NODE_ENV === 'production' && req.header('x-forwarded-proto') !== 'https') {
+        return res.redirect(`https://${req.header('host')}${req.url}`);
+    }
+    next();
+});
+
+// serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
+
+// serve the HTML file for the root route
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index1.html'));
+});
+
 
 const wss = new WebSocket.Server({ 
     server,
@@ -22,44 +60,6 @@ const wss = new WebSocket.Server({
             callback(false, 401, 'Unauthorized'); // Reject the connection
         }
     }
-});
-
-const secretKey = process.env.SECRET_KEY;
-
-// Middleware
-app.use(morgan('combined')); // Log HTTP requests
-app.use(helmet()); // Secure HTTP headers
-
-app.use(helmet({
-    contentSecurityPolicy: {
-        directives: {
-            defaultSrc: ["'self'"],
-            scriptSrc: ["'self'"],  // Allow inline scripts if necessary
-            styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],  // Allow external styles and inline styles
-            fontSrc: ["'self'", "https://fonts.gstatic.com"],  // Allow font sources from Google Fonts
-            imgSrc: ["*"],  // Allow images from any source
-        },
-    },
-}));
-
-app.use((req, res, next) => {
-    // Check if the app is running in production (e.g., on Heroku)
-    if (process.env.NODE_ENV === 'production') {
-        // If not HTTPS, redirect to HTTPS
-        if (req.header('x-forwarded-proto') !== 'https') {
-            return res.redirect(`https://${req.header('host')}${req.url}`);
-        }
-    }
-    // Proceed to the next middleware for development and for HTTPS requests
-    next();
-});
-
-// serve static files from the 'public' directory
-app.use(express.static(path.join(__dirname, 'public')));
-
-// serve the HTML file for the root route
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index1.html'));
 });
 
 function encrypt(text, key) {
@@ -83,7 +83,6 @@ app.post('/check-key', (req, res) => {
     return res.status(200).json({ match: keysMatch });
 });
 
-
 // webSocket handling
 wss.on('connection', ws => {
     ws.on('message', message => {
@@ -102,7 +101,6 @@ wss.on('connection', ws => {
         }
     });
 });
-
 
 // Error handling middleware
 app.use((err, req, res, next) => {

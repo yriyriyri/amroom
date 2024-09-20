@@ -13,8 +13,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const terminal = document.getElementById('terminal');
     const terminalConsole = document.getElementById('terminalconsole');
     
-    const socket = new WebSocket('ws://localhost:3000');
-
+    const socket = new WebSocket('ws://localhost:3000'); //SWITCH TO WSS IN DEPLOYMENT WS IN TESTING
+    //const cleanHTML = DOMPurify.sanitize(dirtyHTML);
+    
     let currentColor = getRandomHexColor();
     applyColor(currentColor)
     let currentUserColor = getRandomHexColor();
@@ -27,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentFont = 'Ubuntu Mono';
     let currentFontSize = 16;
     let currentText = '';
-    let sessionKey = '00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff';
+    let sessionKey = 'default_session_key';
     
     // web-safe fonts
     const webSafeFonts = [
@@ -109,7 +110,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const isKeyValid = await checkKey(parameter);
     
         if (isKeyValid) {
-            socket.send(JSON.stringify(message));
+            const sanitizedMessage = sanitizeInput(message);
+            socket.send(JSON.stringify(sanitizedMessage));
         } else {
             printCmdResponse('Invalid session key: can not send message')
         }
@@ -149,12 +151,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     userInput.addEventListener('input', function() {
         if (activeTerminal === 'terminal') {
-            currentText = `<span style="color: ${currentColor}; font-family: ${currentFont}; font-size: ${currentFontSize};">${userInput.value}</span>`;
+            currentText = `<span style="color: ${currentColor}; font-family: ${currentFont}; font-size: ${currentFontSize};">${sanitizeInput(userInput.value)}</span>`;
             promptUser = `<span class="prompt-user" style="color: ${currentUserColor};">mainroom@${currentUsername}:</span>`;
             writingMessage.innerHTML = `${hiddenChar}${promptUser}${promptLocation}${promptBling}${currentText}${cursor}`;
         }
         else {
-            currentText = `<span style="color: #005353; font-family: Ubuntu Mono; font-size: 16px;">${userInput.value}</span>`;
+            currentText = `<span style="color: #005353; font-family: Ubuntu Mono; font-size: 16px;">${sanitizeInput(userInput.value)}</span>`;
             writingMessageConsole.innerHTML = `${promptAdmin}${promptLocation}${promptBling}${currentText}${consoleCursor}`;
         }
     });
@@ -172,14 +174,13 @@ document.addEventListener('DOMContentLoaded', function() {
             else {
                 if (activeTerminal === 'terminal'){
                     const listItem = document.createElement('li');
-                    const InputText = `<span style="color: ${currentColor}; font-family: ${currentFont}; font-size: ${currentFontSize};">${inputText}</span>`;
+                    const InputText = `<span style="color: ${currentColor}; font-family: ${currentFont}; font-size: ${currentFontSize};">${sanitizeInput(inputText)}</span>`;
                     promptUser = `<span class="prompt-user" style="color: ${currentUserColor};">mainroom@${currentUsername}:</span>`;
                     listItem.innerHTML = `${hiddenChar}${promptUser}${promptLocation}${promptBling}${InputText}`;
-                    innerHTMLString = '${hiddenChar}${promptUser}${promptLocation}${promptBling}${InputText}';
                     sendMessage(listItem.innerHTML,sessionKey)
                 } else {
                     const listItem = document.createElement('li');
-                    const InputText = `<span style="color: #005353; font-family: Ubuntu Mono; font-size: 16px;">${inputText}</span>`;
+                    const InputText = `<span style="color: #005353; font-family: Ubuntu Mono; font-size: 16px;">${sanitizeInput(inputText)}</span>`;
                     listItem.innerHTML = `${promptAdmin}${promptLocation}${promptBling}${InputText}`;
                     consoleMessages.appendChild(listItem);
                 }
@@ -205,7 +206,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function processCommand(command) {
         const [cmd, ...args] = command.split(' '); // split command into parts
-        const arguments = args.join(' ').trim(); 
+        const commandArguments = args.join(' ').trim(); 
 
         switch (cmd) {
             case 'help':
@@ -215,62 +216,62 @@ document.addEventListener('DOMContentLoaded', function() {
                 messages.innerHTML = ''; // clear the messages list
                 break;
             case 'textcolor':
-                if (isValidHexColor(arguments)) {
-                    applyColor(arguments);
+                if (isValidHexColor(commandArguments)) {
+                    applyColor(commandArguments);
                 } else {
-                    printCmdResponse(`Invalid color code: ${arguments}`);
+                    printCmdResponse(`Invalid color code: ${commandArguments}`);
                 }
                 break;
             case 'usercolor':
-                if (isValidHexColor(arguments)) {
-                    applyUserColor(arguments);
+                if (isValidHexColor(commandArguments)) {
+                    applyUserColor(commandArguments);
                 } else {
-                    printCmdResponse(`Invalid color code: ${arguments}`);
+                    printCmdResponse(`Invalid color code: ${commandArguments}`);
                 }
                 break;
             case 'font':
-                if (isValidFont(arguments)){
-                    applyFont(arguments);
+                if (isValidFont(commandArguments)){
+                    applyFont(commandArguments);
                 } else {
-                    printCmdResponse(`Invalid font: ${arguments}`);
+                    printCmdResponse(`Invalid font: ${commandArguments}`);
                 }
                 break;
             case 'fontsize':
-                if (isValidFontSize(arguments)){
-                    applyFontSize(arguments);
+                if (isValidFontSize(commandArguments)){
+                    applyFontSize(commandArguments);
                 } else {
-                    printCmdResponse(`Invalid font size: ${arguments}`);
+                    printCmdResponse(`Invalid font size: ${commandArguments}`);
                 }
                 break;
             case 'fontlist':
                 printCmdResponse(`Font list: ${webSafeFonts} ${customFonts}`);
                 break;
             case 'image':
-                if (isValidImageUrl(arguments)) {
-                    displayImage(arguments);
+                if (isValidImageUrl(commandArguments)) {
+                    displayImage(commandArguments);
                 } else {
-                    printCmdResponse(`Invalid image URL: ${arguments}`);
+                    printCmdResponse(`Invalid image URL: ${commandArguments}`);
                 }
                 break;
             case 'link':
-                if (isValidUrl(arguments)) {
-                    displayLink(arguments);
+                if (isValidUrl(commandArguments)) {
+                    displayLink(commandArguments);
                 } else {
-                    printCmdResponse(`Invalid URL: ${arguments}`);
+                    printCmdResponse(`Invalid URL: ${commandArguments}`);
                 }
                 break;
             case 'username':
-                applyUsername(arguments);
+                applyUsername(commandArguments);
                 break;
             case 'background':
-                if (isValidImageUrl(arguments)){
-                    applyBackground(arguments);
+                if (isValidImageUrl(commandArguments)){
+                    applyBackground(commandArguments);
                 } else {
-                    printCmdResponse(`Invalid image URL: ${arguments}`);
+                    printCmdResponse(`Invalid image URL: ${commandArguments}`);
                 }
                 break;
             case 'sessionkey':
-                sessionKeyChange(arguments);
+                sessionKeyChange(commandArguments);
                 break;
             default:
                 printCmdResponse(`Unknown command: ${cmd}`);
@@ -296,6 +297,27 @@ document.addEventListener('DOMContentLoaded', function() {
         );
     }
     
+    function openingscreen() {
+        const openingscreenstring = 
+            `   _____                 .__  .__                __________                                   
+      /  _  \\   _____   ____ |  | |__| ____   ______ \\______   \\ ____   ____   _____              
+     /  /_\\  \\ /     \\_/ __ \\|  | |  |/ __ \\ /  ___/  |       _//  _ \\ /  _ \\ /     \\             
+    /    |    \\  Y Y  \\  ___/|  |_|  \\  ___/ \\___ \\   |    |   (  <_> |  <_> )  Y Y  \\            
+    \\____|__  /__|_|  /\\___  >____/__|\\___  >____  >  |____|_  /\\____/ \\____/|__|_|  / /\\  /\\  /\\ 
+            \\/      \\/     \\/             \\/     \\/          \\/                    \\/  \\/  \\/  \\/ 
+                                                                                             
+    1> For commands /help in the console.\n
+    2> You won't be able to see message content or send messages unless you have the session key. You can /sessionkey in the console to enter your key.\n
+    3> Move + Change active window with the title bar`;
+    
+        const span = document.createElement('span');
+        span.style.color = '#ff00ff';
+        span.textContent = openingscreenstring;
+    
+        messages.appendChild(span);
+    }
+    
+
     function isValidHexColor(color) {
         return /^#[0-9A-Fa-f]{6}$/.test(color);
     }
@@ -461,6 +483,10 @@ document.addEventListener('DOMContentLoaded', function() {
         username = ('user-' + username)
         return username;
     }
+
+    function sanitizeInput(input) {
+        return DOMPurify.sanitize(input);
+    }
     
     async function decryptMessage(encryptedMessage, key) {
         try {
@@ -514,7 +540,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     async function checkKey(parameter) {
         try {
-            const response = await fetch('http://localhost:3000/check-key', {
+            const response = await fetch('http://localhost:3000/check-key', { //CALL PROPER DOMAIN UPON DEPLOYINH
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -544,26 +570,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return arr;
     }
 
-    function openingscreen() {
-        const openingscreenstring = 
-            `   _____                 .__  .__                __________                                   
-      /  _  \\   _____   ____ |  | |__| ____   ______ \\______   \\ ____   ____   _____              
-     /  /_\\  \\ /     \\_/ __ \\|  | |  |/ __ \\ /  ___/  |       _//  _ \\ /  _ \\ /     \\             
-    /    |    \\  Y Y  \\  ___/|  |_|  \\  ___/ \\___ \\   |    |   (  <_> |  <_> )  Y Y  \\            
-    \\____|__  /__|_|  /\\___  >____/__|\\___  >____  >  |____|_  /\\____/ \\____/|__|_|  / /\\  /\\  /\\ 
-            \\/      \\/     \\/             \\/     \\/          \\/                    \\/  \\/  \\/  \\/ 
-                                                                                             
-    1> For commands /help in the console.\n
-    2> You won't be able to see message content or send messages unless you have the session key. You can /sessionkey in the console to enter your key.\n
-    3> Move + Change active window with the title bar`;
-    
-        const span = document.createElement('span');
-        span.style.color = '#ff00ff';
-        span.textContent = openingscreenstring;
-    
-        messages.appendChild(span);
-    }
-    
     userInput.addEventListener('blur', function() {
         userInput.focus();
     });
