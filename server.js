@@ -10,7 +10,7 @@ const crypto = require('crypto');
 const rateLimit = require('express-rate-limit');
 const fs = require('fs'); // for logging into a file
 
-const allowedOrigins = ['http://your-allowed-origin.com', 'http://localhost:3000'];
+const allowedOrigins = ['http://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion', 'http://localhost:3000'];
 const secretKey = process.env.SECRET_KEY;
 
 const app = express();
@@ -41,12 +41,12 @@ app.use(helmet({
 app.use(express.json());
 
 // HTTPS Redirect Middleware
-app.use((req, res, next) => {
-    if (process.env.NODE_ENV === 'production' && req.header('x-forwarded-proto') !== 'https') {
-        return res.redirect(`https://${req.header('host')}${req.url}`);
-    }
-    next();
-});
+// app.use((req, res, next) => {
+//     if (process.env.NODE_ENV === 'production' && req.header('x-forwarded-proto') !== 'https') {
+//         return res.redirect(`https://${req.header('host')}${req.url}`);
+//     }
+//     next();
+// });
 
 // serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));

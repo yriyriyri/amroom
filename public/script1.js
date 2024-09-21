@@ -563,7 +563,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     async function checkKey(parameter) {
         try {
-            const response = await fetch('http://localhost:3000/check-key', { //CALL PROPER DOMAIN UPON DEPLOYINH
+            const response = await fetch('http://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion/check-key', { //CALL PROPER DOMAIN UPON DEPLOYINH
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
