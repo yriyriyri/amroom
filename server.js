@@ -10,7 +10,10 @@ const crypto = require('crypto');
 const rateLimit = require('express-rate-limit');
 const fs = require('fs'); // for logging into a file
 
-const allowedOrigins = ['http://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion', 'http://localhost:3000'];
+const allowedOrigins = [
+    'http://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion',
+    'http://localhost:3000'
+];
 const secretKey = process.env.SECRET_KEY;
 
 const app = express();
@@ -27,29 +30,23 @@ app.use(morgan('combined')); // Log HTTP requests
 app.use(helmet()); // Secure HTTP headers
 
 app.use(helmet({
+    hsts: false, // Disable HSTS if present
     contentSecurityPolicy: {
         directives: {
-            defaultSrc: ["'self'"],
-            scriptSrc: ["'self'", "https://cdnjs.cloudflare.com"],  // Allow scripts from self and Cloudflare
-            styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],  // Allow external styles and inline styles
-            fontSrc: ["'self'", "https://fonts.gstatic.com"],  // Allow font sources from Google Fonts
-            imgSrc: ["*"],  // Allow images from any source
+            defaultSrc: ["'self'", "data:", "http://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion"],
+            scriptSrc: ["'self'", "http://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion", "public/libs/purify.min.js"],
+            styleSrc: ["'self'", "'unsafe-inline'", "http://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion/style1.css"],
+            fontSrc: ["'self'", "https://fonts.gstatic.com"],
+            imgSrc: ["*"]
         },
     },
+    referrerPolicy: { policy: "no-referrer" },
 }));
-
 app.use(express.json());
 
-// HTTPS Redirect Middleware
-// app.use((req, res, next) => {
-//     if (process.env.NODE_ENV === 'production' && req.header('x-forwarded-proto') !== 'https') {
-//         return res.redirect(`https://${req.header('host')}${req.url}`);
-//     }
-//     next();
-// });
-
 // serve static files from the 'public' directory
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('/media/sf_chatroom/public'));
+// app.use(express.static(path.join(__dirname, 'public')));
 
 // serve the HTML file for the root route
 app.get('/', (req, res) => {
