@@ -1,7 +1,8 @@
 require('dotenv').config(); // Load environment variables
 
 const express = require('express');
-const http = require('http');
+//const http = require('http');
+const https = require('https');
 const WebSocket = require('ws');
 const path = require('path');
 const morgan = require('morgan');
@@ -10,14 +11,21 @@ const crypto = require('crypto');
 const rateLimit = require('express-rate-limit');
 const fs = require('fs'); // for logging into a file
 
+const options = {
+    key: fs.readFileSync('private.key'), // Adjust path if needed
+    cert: fs.readFileSync('certificate.crt'), // Adjust path if needed
+};
+
 const allowedOrigins = [
-    'http://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion',
-    'http://localhost:3000'
+    'https://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion',
+    'http://localhost:3000',
+    'https://localhost:3000'
+
 ];
 const secretKey = process.env.SECRET_KEY;
 
 const app = express();
-const server = http.createServer(app);
+const server = https.createServer(options,app);
 
 const limiter = rateLimit({
     windowMs: 1 * 60 * 1000, // 1 minute
@@ -33,9 +41,9 @@ app.use(helmet({
     hsts: false, // Disable HSTS if present
     contentSecurityPolicy: {
         directives: {
-            defaultSrc: ["'self'", "data:", "http://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion"],
-            scriptSrc: ["'self'", "http://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion", "public/libs/purify.min.js"],
-            styleSrc: ["'self'", "'unsafe-inline'", "http://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion/style1.css"],
+            defaultSrc: ["'self'", "data:", "https://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion"],
+            scriptSrc: ["'self'", "https://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion", "public/libs/purify.min.js"],
+            styleSrc: ["'self'", "'unsafe-inline'", "https://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion/style1.css"],
             fontSrc: ["'self'", "https://fonts.gstatic.com"],
             imgSrc: ["*"]
         },
@@ -45,8 +53,8 @@ app.use(helmet({
 app.use(express.json());
 
 // serve static files from the 'public' directory
-app.use(express.static('/media/sf_chatroom/public'));
-// app.use(express.static(path.join(__dirname, 'public')));
+// app.use(express.static('/media/sf_chatroom/public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // serve the HTML file for the root route
 app.get('/', (req, res) => {
@@ -134,5 +142,7 @@ app.use((err, req, res, next) => {
 // Start the server
 const PORT = process.env.PORT || 3000; // Use environment variable or default to 3000
 server.listen(PORT, () => {
-    console.log(`Server is listening on http://localhost:${PORT}`);
+    console.log(`Server is listening on https://localhost:${PORT}`);
 });
+
+

@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const terminal = document.getElementById('terminal');
     const terminalConsole = document.getElementById('terminalconsole');
     
-    const socket = new WebSocket('ws://localhost:3000'); //SWITCH TO WSS IN DEPLOYMENT WS IN TESTING
+    const socket = new WebSocket('wss://localhost:3000'); //SWITCH TO WSS IN DEPLOYMENT WS IN TESTING
     //const cleanHTML = DOMPurify.sanitize(dirtyHTML);
     
     let currentColor = getRandomHexColor();
@@ -563,7 +563,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     async function checkKey(parameter) {
         try {
-            const response = await fetch('http://localhost:3000/check-key', { //CALL PROPER DOMAIN UPON DEPLOYINH
+            const response = await fetch('https://localhost:3000/check-key', { //CALL PROPER DOMAIN UPON DEPLOYINH
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
