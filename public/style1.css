@@ -1,12 +1,12 @@
-/* @import url('https://fonts.googleapis.com/css?family=Ubuntu');
+@import url('https://fonts.googleapis.com/css?family=Ubuntu');
 @import url('https://fonts.googleapis.com/css?family=Ubuntu+Mono'); 
 @import url('https://fonts.googleapis.com/css?family=Tangerine');
-@import url('https://fonts.googleapis.com/css?family=Mrs+Saint+Delafield'); */
+@import url('https://fonts.googleapis.com/css?family=Mrs+Saint+Delafield');
 
 body { 
-  background: linear-gradient(45deg, #0f0be9 0%,#0bebdf 100%); 
+  /* background: linear-gradient(45deg, #0f0be9 0%,#0bebdf 100%);  */
   /* background-image: url('https://i.ibb.co/vXKCtTp/1725217284794c-crop-2024-09-18-22-43-51.jpg');   */
-  /* background-image: url('https://i.pinimg.com/736x/cd/94/8e/cd948e379da51264047bc20c0b772731.jpg'); */
+  background-image: url('https://i.pinimg.com/736x/cd/94/8e/cd948e379da51264047bc20c0b772731.jpg');
   background-size: cover;                      
   background-position: center;                 
   background-repeat: no-repeat;                

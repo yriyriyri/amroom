@@ -2,7 +2,7 @@ require('dotenv').config(); // Load environment variables
 
 const express = require('express');
 //const http = require('http');
-const https = require('https');
+const http = require('http');
 const WebSocket = require('ws');
 const path = require('path');
 const morgan = require('morgan');
@@ -25,7 +25,7 @@ const allowedOrigins = [
 const secretKey = process.env.SECRET_KEY;
 
 const app = express();
-const server = https.createServer(options,app);
+const server = http.createServer(options,app);
 
 const limiter = rateLimit({
     windowMs: 1 * 60 * 1000, // 1 minute
@@ -41,9 +41,9 @@ app.use(helmet({
     hsts: false, // Disable HSTS if present
     contentSecurityPolicy: {
         directives: {
-            defaultSrc: ["'self'", "data:", "https://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion"],
-            scriptSrc: ["'self'", "https://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion", "public/libs/purify.min.js"],
-            styleSrc: ["'self'", "'unsafe-inline'", "https://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion/style1.css"],
+            defaultSrc: ["'self'", "data:"],
+            scriptSrc: ["'self'", "public/libs/purify.min.js"],
+            styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.gstatic.com", "https://fonts.googleapis.com"],
             fontSrc: ["'self'", "https://fonts.gstatic.com"],
             imgSrc: ["*"]
         },
@@ -142,7 +142,7 @@ app.use((err, req, res, next) => {
 // Start the server
 const PORT = process.env.PORT || 3000; // Use environment variable or default to 3000
 server.listen(PORT, () => {
-    console.log(`Server is listening on https://localhost:${PORT}`);
+    console.log(`Server is listening on http://localhost:${PORT}`);
 });
 
 
