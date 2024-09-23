@@ -11,21 +11,15 @@ const crypto = require('crypto');
 const rateLimit = require('express-rate-limit');
 const fs = require('fs'); // for logging into a file
 
-const options = {
-    key: fs.readFileSync('private.key'), // Adjust path if needed
-    cert: fs.readFileSync('certificate.crt'), // Adjust path if needed
-};
-
 const allowedOrigins = [
-    'https://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion',
+    'http://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion',
     'http://localhost:3000',
-    'https://localhost:3000'
 
 ];
 const secretKey = process.env.SECRET_KEY;
 
 const app = express();
-const server = http.createServer(options,app);
+const server = http.createServer(app);
 
 const limiter = rateLimit({
     windowMs: 1 * 60 * 1000, // 1 minute
@@ -33,27 +27,27 @@ const limiter = rateLimit({
     message: { error: 'Too many attempts, please try again later.' }
 });
 
-// Middleware
-app.use(morgan('combined')); // Log HTTP requests
-app.use(helmet()); // Secure HTTP headers
+// middleware
+app.use(morgan('combined')); // log HTTP requests
+//app.use(helmet()); // secure HTTP headers
 
 app.use(helmet({
-    hsts: false, // Disable HSTS if present
+    hsts: false, //for testting 
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'", "data:"],
             scriptSrc: ["'self'", "public/libs/purify.min.js"],
-            styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.gstatic.com", "https://fonts.googleapis.com"],
-            fontSrc: ["'self'", "https://fonts.gstatic.com"],
+            styleSrc: ["'self'", "'unsafe-inline'", "http://fonts.gstatic.com", "http://fonts.googleapis.com"],
+            fontSrc: ["'self'", "http://fonts.gstatic.com"],
             imgSrc: ["*"]
         },
     },
     referrerPolicy: { policy: "no-referrer" },
 }));
+
 app.use(express.json());
 
 // serve static files from the 'public' directory
-// app.use(express.static('/media/sf_chatroom/public'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // serve the HTML file for the root route

@@ -549,7 +549,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     tagLength: 128
                 },
                 cryptoKey,
-                combinedData // Use the combined encrypted data and auth tag
+                combinedData // use the combined encrypted data and auth tag
             ).then(decryptedArrayBuffer => {
                 // Convert ArrayBuffer to string
                 const decoder = new TextDecoder('utf-8');
@@ -563,7 +563,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     async function checkKey(parameter) {
         try {
-            const response = await fetch('https://localhost:3000/check-key', { //CALL PROPER DOMAIN UPON DEPLOYINH
+            const response = await fetch('http://localhost:3000/check-key', { //CALL PROPER DOMAIN UPON DEPLOYINH
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
