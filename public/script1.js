@@ -13,8 +13,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const terminal = document.getElementById('terminal');
     const terminalConsole = document.getElementById('terminalconsole');
     
-    const socket = new WebSocket('ws://localhost:3000'); //SWITCH TO WSS IN DEPLOYMENT WS IN TESTING
-    //const cleanHTML = DOMPurify.sanitize(dirtyHTML);
+    const socket = new WebSocket('ws://localhost:3000');
+
+    socket.onopen = () => {
+        console.log('Connected to WebSocket server');
+    };
+    
+    socket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+    };
+    
+    socket.onclose = () => {
+        console.log('WebSocket connection closed');
+    };
     
     let currentColor = getRandomHexColor();
     applyColor(currentColor)
@@ -119,6 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     terminalBar.addEventListener('mousedown', function(event) {
         // printCmdResponse(CurrentText)
+        userInput.focus();
         startDragging(event, terminal);
         if (activeTerminal === 'terminalConsole'){
             userInput.value = ''
@@ -134,6 +146,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     terminalBarConsole.addEventListener('mousedown', function(event) {
         // printCmdResponse(CurrentText)
+        userInput.focus();
         startDragging(event, terminalConsole);
         if (activeTerminal === 'terminal'){
             userInput.value = ''
@@ -149,11 +162,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     userInput.addEventListener('input', function() {
         if (activeTerminal === 'terminal') {
+            userInput.focus();
             currentText = `<span style="color: ${currentColor}; font-family: ${currentFont}; font-size: ${currentFontSize};">${sanitizeInput(userInput.value)}</span>`;
             promptUser = `<span class="prompt-user" style="color: ${currentUserColor};">mainroom@${currentUsername}:</span>`;
             writingMessage.innerHTML = `${hiddenChar}${promptUser}${promptLocation}${promptBling}${currentText}${cursor}`;
         }
         else {
+            userInput.focus();
             currentText = `<span style="color: #005353; font-family: Ubuntu Mono; font-size: 16px;">${sanitizeInput(userInput.value)}</span>`;
             writingMessageConsole.innerHTML = `${promptAdmin}${promptLocation}${promptBling}${currentText}${consoleCursor}`;
         }

@@ -4,16 +4,13 @@ const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
 const path = require('path');
-// const helmet = require('helmet');
 const crypto = require('crypto');
 const rateLimit = require('express-rate-limit');
 const fs = require('fs'); // for logging into a file
 const cors = require('cors');
 
 const allowedOrigins = [
-    'http://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion',
     'http://localhost:3000',
-    'http://vhw4esgaun7zckw4kstkrzfhischtxvyefyzitcvtejm6sunyj5sl7yd.onion',
 ];
 const secretKey = process.env.SECRET_KEY;
 const app = express();
@@ -27,31 +24,15 @@ const limiter = rateLimit({
 });
 
 app.use((req, res, next) => {
+    res.setHeader("Content-Security-Policy", "default-src http: ws: data:; style-src http: 'unsafe-inline'; script-src http: 'unsafe-inline' 'unsafe-eval' data:; connect-src http: ws:; img-src http: data:;");
+    next();
+});
+
+
+app.use((req, res, next) => {
     console.log(`${req.method} request for '${req.url}' from ${req.ip}`);
     next();
 });
-
-app.use((req, res, next) => {
-    res.setHeader("Content-Security-Policy", "default-src http:; style-src http:; script-src http:;");
-    next();
-});
-
-// app.use(helmet({
-//     hsts: false, //for testing
-//     contentSecurityPolicy: {
-//         directives: {
-//             defaultSrc: ["'self'", "data:"],
-//             scriptSrc: ["'self'", "http://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion/libs/purify.min.js", "'unsafe-inline'"],
-//             styleSrc: ["'self'", "'unsafe-inline'", "http://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion/style1.css", "http://fonts.gstatic.com", "http://fonts.googleapis.com"],
-//             fontSrc: ["'self'", "http://fonts.gstatic.com"],
-//             imgSrc: ["*"],
-//             upgradeInsecureRequests: [],
-//             blockAllMixedContent: true,
-//             // Ensure upgrade-insecure-requests is NOT included
-//         },
-//     },
-//     referrerPolicy: { policy: "no-referrer" },
-// }));
 
 app.use(express.json());
 
@@ -64,11 +45,13 @@ app.get('/', (req, res) => {
     console.log('Served index1.html');
 });
 
-const wss = new WebSocket.Server({ 
-    server,
+const wss = new WebSocket.Server({
+    server: server, // Attach WebSocket server to the HTTP server
     verifyClient: (info, callback) => {
+        
         const origin = info.origin;
         console.log(`WebSocket connection attempt from origin: ${origin}`);
+        
         // Allow connections from defined origins or any .onion addresses
         if (allowedOrigins.includes(origin) || origin.endsWith('.onion')) {
             callback(true); // Accept the connection
@@ -79,6 +62,7 @@ const wss = new WebSocket.Server({
         }
     }
 });
+
 
 function logInvalidAttempt(ip, origin, parameter) {
     const logMessage = `${new Date().toISOString()} - Invalid attempt from IP: ${ip}, Origin: ${origin}, Key: ${parameter}\n`;
@@ -146,11 +130,6 @@ wss.on('connection', ws => {
     ws.on('error', (error) => {
         console.error('WebSocket error:', error);
     });
-});
-
-app.post('/csp-violation-report-endpoint', (req, res) => {
-    console.log('CSP Violation Report:', req.body);
-    res.sendStatus(204); // Respond with no content
 });
 
 // Error handling middleware
