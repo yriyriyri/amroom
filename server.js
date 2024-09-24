@@ -26,6 +26,15 @@ const limiter = rateLimit({
     message: { error: 'Too many attempts, please try again later.' }
 });
 
+app.use((req, res, next) => {
+    console.log(`${req.method} request for '${req.url}' from ${req.ip}`);
+    next();
+});
+
+app.use((req, res, next) => {
+    res.setHeader("Content-Security-Policy", "default-src http:; style-src http:; script-src http:;");
+    next();
+});
 
 // app.use(helmet({
 //     hsts: false, //for testing
@@ -52,17 +61,21 @@ app.use(express.static(path.join(__dirname, 'public')));
 // serve the HTML file for the root route
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index1.html'));
+    console.log('Served index1.html');
 });
 
 const wss = new WebSocket.Server({ 
     server,
     verifyClient: (info, callback) => {
         const origin = info.origin;
+        console.log(`WebSocket connection attempt from origin: ${origin}`);
         // Allow connections from defined origins or any .onion addresses
         if (allowedOrigins.includes(origin) || origin.endsWith('.onion')) {
             callback(true); // Accept the connection
+            console.log('WebSocket connection accepted');
         } else {
             callback(false, 401, 'Unauthorized'); // Reject the connection
+            console.log('WebSocket connection rejected: Unauthorized origin');
         }
     }
 });
@@ -109,6 +122,7 @@ app.post('/check-key', limiter, (req, res) => {
 
 // webSocket handling
 wss.on('connection', ws => {
+    console.log('WebSocket connection established');
     ws.on('message', message => {
         try {
             const data = JSON.parse(message); // Debugging 
@@ -124,6 +138,19 @@ wss.on('connection', ws => {
             console.error('Error parsing message:', error);
         }
     });
+
+    ws.on('close', () => {
+        console.log('WebSocket connection closed');
+    });
+
+    ws.on('error', (error) => {
+        console.error('WebSocket error:', error);
+    });
+});
+
+app.post('/csp-violation-report-endpoint', (req, res) => {
+    console.log('CSP Violation Report:', req.body);
+    res.sendStatus(204); // Respond with no content
 });
 
 // Error handling middleware

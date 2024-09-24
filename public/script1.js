@@ -22,9 +22,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentUsername = getRandomUsername();
 
 
-    // let currentColor = '#ffffff';
-    // let currentUserColor = '#002323';
-    // let currentUsername = 'temp-username'
     let currentFont = 'Ubuntu Mono';
     let currentFontSize = 16;
     let currentText = '';
@@ -300,7 +297,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function openingscreen() {
         const openingscreenstring = 
-            `   _____                 .__  .__                __________                                   
+    `   _____                 .__  .__                __________                                   
       /  _  \\   _____   ____ |  | |__| ____   ______ \\______   \\ ____   ____   _____              
      /  /_\\  \\ /     \\_/ __ \\|  | |  |/ __ \\ /  ___/  |       _//  _ \\ /  _ \\ /     \\             
     /    |    \\  Y Y  \\  ___/|  |_|  \\  ___/ \\___ \\   |    |   (  <_> |  <_> )  Y Y  \\            
