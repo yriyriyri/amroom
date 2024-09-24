@@ -18,7 +18,6 @@
     "express": "^4.21.0",
     "express-rate-limit": "^7.4.0",
     "greenlock-express": "^4.0.3",
-    "helmet": "^7.1.0",
     "morgan": "^1.10.0",
     "ws": "^8.18.0"
   }

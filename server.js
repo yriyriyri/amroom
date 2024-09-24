@@ -1,24 +1,23 @@
 require('dotenv').config(); // Load environment variables
 
 const express = require('express');
-//const http = require('http');
 const http = require('http');
 const WebSocket = require('ws');
 const path = require('path');
-const morgan = require('morgan');
-const helmet = require('helmet');
+// const helmet = require('helmet');
 const crypto = require('crypto');
 const rateLimit = require('express-rate-limit');
 const fs = require('fs'); // for logging into a file
+const cors = require('cors');
 
 const allowedOrigins = [
     'http://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion',
     'http://localhost:3000',
-
+    'http://vhw4esgaun7zckw4kstkrzfhischtxvyefyzitcvtejm6sunyj5sl7yd.onion',
 ];
 const secretKey = process.env.SECRET_KEY;
-
 const app = express();
+app.use(cors());
 const server = http.createServer(app);
 
 const limiter = rateLimit({
@@ -27,23 +26,23 @@ const limiter = rateLimit({
     message: { error: 'Too many attempts, please try again later.' }
 });
 
-// middleware
-app.use(morgan('combined')); // log HTTP requests
-//app.use(helmet()); // secure HTTP headers
 
-app.use(helmet({
-    hsts: false, //for testting 
-    contentSecurityPolicy: {
-        directives: {
-            defaultSrc: ["'self'", "data:"],
-            scriptSrc: ["'self'", "public/libs/purify.min.js"],
-            styleSrc: ["'self'", "'unsafe-inline'", "http://fonts.gstatic.com", "http://fonts.googleapis.com"],
-            fontSrc: ["'self'", "http://fonts.gstatic.com"],
-            imgSrc: ["*"]
-        },
-    },
-    referrerPolicy: { policy: "no-referrer" },
-}));
+// app.use(helmet({
+//     hsts: false, //for testing
+//     contentSecurityPolicy: {
+//         directives: {
+//             defaultSrc: ["'self'", "data:"],
+//             scriptSrc: ["'self'", "http://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion/libs/purify.min.js", "'unsafe-inline'"],
+//             styleSrc: ["'self'", "'unsafe-inline'", "http://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion/style1.css", "http://fonts.gstatic.com", "http://fonts.googleapis.com"],
+//             fontSrc: ["'self'", "http://fonts.gstatic.com"],
+//             imgSrc: ["*"],
+//             upgradeInsecureRequests: [],
+//             blockAllMixedContent: true,
+//             // Ensure upgrade-insecure-requests is NOT included
+//         },
+//     },
+//     referrerPolicy: { policy: "no-referrer" },
+// }));
 
 app.use(express.json());
 
@@ -55,12 +54,12 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index1.html'));
 });
 
-
 const wss = new WebSocket.Server({ 
     server,
     verifyClient: (info, callback) => {
         const origin = info.origin;
-        if (allowedOrigins.includes(origin)) {
+        // Allow connections from defined origins or any .onion addresses
+        if (allowedOrigins.includes(origin) || origin.endsWith('.onion')) {
             callback(true); // Accept the connection
         } else {
             callback(false, 401, 'Unauthorized'); // Reject the connection
