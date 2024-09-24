@@ -1,2 +1,4 @@
 2024-09-20T09:30:36.648Z - Invalid attempt from IP: ::1, Origin: http://localhost:3000, Key: invaaallliiidddd
 2024-09-24T02:46:00.285Z - Invalid attempt from IP: ::1, Origin: http://localhost:3000, Key: CHECKEHCK23
+2024-09-24T21:34:46.860Z - Invalid attempt from IP: ::ffff:127.0.0.1, Origin: http://localhost:3000, Key: http://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion/
+2024-09-24T21:35:11.208Z - Invalid attempt from IP: ::ffff:127.0.0.1, Origin: http://localhost:3000, Key: SECRET_KEY='00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff'

@@ -13,8 +13,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const terminal = document.getElementById('terminal');
     const terminalConsole = document.getElementById('terminalconsole');
     
-    // const socket = new WebSocket('ws://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion:3000');
-    const socket = new WebSocket('ws://localhost:3000');
+    const socket = new WebSocket('ws://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion:3000');
+    // const socket = new WebSocket('ws://localhost:3000');
 
     socket.onopen = () => {
         console.log('Connected to WebSocket server');
