@@ -13,8 +13,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const terminal = document.getElementById('terminal');
     const terminalConsole = document.getElementById('terminalconsole');
     
-    // const socket = new WebSocket('ws://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion:3000');
-    const socket = new WebSocket('ws://localhost:3000');
+    const socket = new WebSocket('ws://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion');
+    // const socket = new WebSocket('ws://localhost:3000');
 
     socket.onopen = () => {
         console.log('Connected to WebSocket server');
@@ -495,6 +495,7 @@ document.addEventListener('DOMContentLoaded', function() {
             printCmdResponse('Key is invalid');
         }
     }
+
     function onMouseUp() {
         isDragging = false;
         draggingTerminal = null;  
@@ -583,7 +584,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     async function checkKey(parameter) {
         try {
-            const response = await fetch('http://localhost:3000/check-key', { //CALL PROPER DOMAIN UPON DEPLOYINH
+            const response = await fetch('http://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion//check-key', { //CALL PROPER DOMAIN UPON DEPLOYINH
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
