@@ -72,6 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
     writingMessageConsole.innerHTML = `${promptAdmin}${promptLocation}${promptBling}${consoleCursor}`;
 
 
+
     socket.addEventListener('message', function(event) {
         const message = event.data;
         console.log('Encrypted message:', message);
@@ -127,6 +128,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     userInput.focus();
+
+    document.addEventListener('mouseup', function() {
+        userInput.focus();  // try to fix firefox 
+    });
+    
 
     terminalBar.addEventListener('mousedown', function(event) {
         // printCmdResponse(CurrentText)
