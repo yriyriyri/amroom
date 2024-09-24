@@ -11,6 +11,7 @@ const cors = require('cors');
 
 const allowedOrigins = [
     'http://localhost:3000',
+    'http://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion',
 ];
 const secretKey = process.env.SECRET_KEY;
 const app = express();
@@ -24,7 +25,7 @@ const limiter = rateLimit({
 });
 
 app.use((req, res, next) => {
-    res.setHeader("Content-Security-Policy", "default-src http: ws: data:; style-src http: 'unsafe-inline'; script-src http: 'unsafe-inline' 'unsafe-eval' data:; connect-src http: ws:; img-src http: data:;");
+    res.setHeader("Content-Security-Policy", "default-src http: ws: data:; style-src http: 'unsafe-inline'; script-src http: 'unsafe-inline' 'unsafe-eval' data:; connect-src http: ws:; img-src *;");
     next();
 });
 
