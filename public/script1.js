@@ -312,9 +312,11 @@ document.addEventListener('DOMContentLoaded', function() {
             '7. /font <font-name> - Change the font to the specified name.\n' +
             '8. /fontsize <size> - Change the font size to the specified value.\n' +
             '9. /fontlist - Display a list of available fonts.\n' +
-            '10./image <url> - Display an image from the specified URL.\n' +
-            '11./link <url> - Display a hyperlink to the specified URL.\n' +
-            '12./background <url> - Change the background image to the specified URL.'
+            '10./link <url> - Display a hyperlink to the specified URL.\n' +
+            '11./image <url> - Display an image from the specified URL.' +
+            `<span style="color: #ff0000; background-color: #000000; padding: 2px;">Currently disabled for security</span>\n` +
+            '12./background <url> - Change the background image to the specified URL.' +
+            `<span style="color: #ff0000; background-color: #000000; padding: 2px;">Currently disabled for security</span>` 
         );
     }
     
