@@ -13,8 +13,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const terminal = document.getElementById('terminal');
     const terminalConsole = document.getElementById('terminalconsole');
     
-    const socket = new WebSocket('ws://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion:3000');
-    // const socket = new WebSocket('ws://localhost:3000');
+    // const socket = new WebSocket('ws://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion:3000');
+    const socket = new WebSocket('ws://localhost:3000');
 
     socket.onopen = () => {
         console.log('Connected to WebSocket server');
@@ -82,7 +82,8 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(decryptedMessage => {
                 // console.log('Decrypted message:', decryptedMessage);
                 if (decryptedMessage == 'Failed Decrypt'){
-                    const hiddenUserOutput = `<span style="color: #000000; font-family: Ubuntu Mono; font-size: 16px;">${message}</span>`;
+                    const scramble = generateRandomString(100)
+                    const hiddenUserOutput = `<span style="color: #000000; font-family: Ubuntu Mono; font-size: 16px;">${scramble}</span>`;
                     const warning = `<span style="color: #ff0000; font-family: Ubuntu Mono; font-size: 16px;">Session key invalid, cannot decrypt: Change session key</span>`;
                     const listItem = document.createElement('li');
                     listItem.innerHTML = `${promptHiddenUser}${promptLocation}${promptBling}${hiddenUserOutput}${warning}`;
@@ -611,6 +612,18 @@ document.addEventListener('DOMContentLoaded', function() {
             arr[i / 2] = parseInt(hex.substr(i, 2), 16);
         }
         return arr;
+    }
+
+    function generateRandomString(maxLength) {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+[]{}|;:,.<>?';
+        const randomLength = Math.floor(Math.random() * maxLength) + 1;
+        let randomString = '';
+        for (let i = 0; i < randomLength; i++) {
+            // Select a random character from the characters string
+            const randomIndex = Math.floor(Math.random() * characters.length);
+            randomString += characters[randomIndex];
+        }
+        return randomString;
     }
 
     userInput.addEventListener('blur', function() {
