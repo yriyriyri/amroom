@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
         "vu", "wf", "ws", "ye", "yt", "za", "zm", "zw"
     ];
 
-    const events = [jackpot];
+    // const events = [flashImage];
 
     let cursor = `<span id="terminal__prompt--cursor" style="height: 0.8em; animation: blink 1200ms linear infinite;"></span>`;
     let consoleCursor = `<span id="terminal__prompt--consolecursor" style="height: 0.8em; animation: consoleblink 1200ms linear infinite;"></span>`;
@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
     openingscreen()
     help()
     displayRandomFlags()
-    eventHandler()
+    // eventHandler()
 
     writingMessage.innerHTML = `${hiddenChar}${promptUser}${promptLocation}${promptBling}`;
     writingMessageConsole.innerHTML = `${promptAdmin}${promptLocation}${promptBling}${consoleCursor}`;
@@ -400,7 +400,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function displayRandomFlags() {
         const flagBanner = document.getElementById('flag-banner');
         flagBanner.innerHTML = ''; // clear previous flags
-        const shuffledCodes = countryCodes.sort(() => 0.5 - Math.random()).slice(0, 30);
+        const shuffledCodes = countryCodes.sort(() => 0.5 - Math.random()).slice(0, 50);
         shuffledCodes.forEach(code => {
             const img = document.createElement('img');
             img.src = `flags/${code}.gif`; // Path to the flag image
@@ -703,28 +703,42 @@ document.addEventListener('DOMContentLoaded', function() {
         return randomString;
     }
 
-    function eventHandler() {
-        setInterval(() => {
-            const randomEvent = events[Math.floor(Math.random() * events.length)];
-            randomEvent();
-        }, 10000); // 10 seconds interval
-    }
+    // function eventHandler() {
+    //     setInterval(() => {
+    //         const randomEvent = events[Math.floor(Math.random() * events.length)];
+    //         randomEvent();
+    //     }, 10000); // 10 seconds interval
+    // }
 
-    function jackpot() {
-        const overlay = document.getElementById('money');
-        const videoContainer = document.getElementById('jackpot-vid');
-        const video = document.getElementById('jackpot-video');
-        overlay.style.display = 'flex';
-        // show and play the video
-        videoContainer.style.display = 'block';
-        video.play();
+    // function flashImage() {
+    //     const images = [
+           
+    //     ];
     
-        // hide the overlay and video when the video ends
-        video.onended = () => {
-            overlay.style.display = 'none';
-            videoContainer.style.display = 'none';
-        };
-    }
+    //     // Randomly select an image
+    //     const randomIndex = Math.floor(Math.random() * images.length);
+    //     const selectedImage = images[randomIndex];
+    //     const img = document.getElementById('flash-image');
+    //     img.src = selectedImage; // Set the source to the randomly selected image
+    //     img.style.display = 'block'; // Show the image
+    
+    //     // Randomly position the image on the screen
+    //     img.style.top = `${Math.random() * (window.innerHeight - img.naturalHeight)}px`;
+    //     img.style.left = `${Math.random() * (window.innerWidth - img.naturalWidth)}px`;
+    
+    //     // Flashing logic
+    //     let count = 0; // Count the number of flashes
+    //     const flashInterval = setInterval(() => {
+    //         if (count < 3) {
+    //             img.style.opacity = img.style.opacity === '1' ? '0' : '1'; // Toggle opacity
+    //             count++;
+    //         } else {
+    //             clearInterval(flashInterval); // Stop the flashing
+    //             img.style.display = 'none'; // Hide the image after flashing
+    //         }
+    //     }, 100); // Flash every 100 milliseconds (0.1 seconds)
+    // }
+    
 
     userInput.addEventListener('blur', function() {
         userInput.focus();

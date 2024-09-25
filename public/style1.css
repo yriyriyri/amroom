@@ -3,6 +3,10 @@
 @import url('https://fonts.googleapis.com/css?family=Tangerine');
 @import url('https://fonts.googleapis.com/css?family=Mrs+Saint+Delafield');
 
+* {
+  user-select: none; 
+}
+
 body { 
   background-image: url('elements/images.jpg');
   background-size: cover;                      
@@ -14,18 +18,25 @@ body {
   overflow: hidden;
 } 
 
-.dragon-gif {
+.lifelover {
   position: absolute; 
-  right: 20px; 
-  top: 20px; 
-  width: 200px; 
-  height: 500px; 
-  z-index: 400; /* Ensure the GIF appears above other content */
+  right: -40px; 
+  bottom: -3px; 
+  width: auto; 
+  height: auto; 
+  z-index: 1; 
+  visibility: hidden;
+}
+
+.lifelover img {
+  pointer-events: none;
+  width: 52vh;
+  height: auto; 
 }
 
 .ads {
   position: absolute;
-  bottom: 10px;       
+  bottom: 20px;       
   left: 40px;          
   width: 630px;       
   height: 50px;       
@@ -128,8 +139,8 @@ body {
   position: absolute;
   width: 90vw;  
   height: 80vh;  
-  left: 100;
-  top: 100;
+  left: 70px;
+  top: 70px;
   box-shadow: 2px 4px 10px rgba(0,0,0,0.5);
   z-index: 1;
 } 
@@ -137,8 +148,8 @@ body {
   position: absolute;
   width: 50vw;  
   height: 40vh;  
-  left: 660px;
-  top: 380px;
+  right: 25px;
+  bottom: 40px;
   box-shadow: 2px 4px 10px rgba(0,0,0,0.5);
   z-index:  2;
 } 
