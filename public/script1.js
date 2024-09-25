@@ -68,9 +68,9 @@ document.addEventListener('DOMContentLoaded', function() {
         "fo", "fr", "ga", "gb", "gd", "ge", "gf", "gg",
         "gh", "gi", "gl", "gm", "gn", "gp", "gq", "gr",
         "gt", "gu", "gw", "gy", "hk", "hm", "hn", "hr",
-        "ht", "hu", "id", "ie", "il", "im", "in", "io",
-        "iq", "ir", "is", "it", "je", "jm", "jn", "jo",
-        "jp", "ke", "kg", "kh", "ki", "kj", "km", "kn",
+        "ht", "hu", "id", "ie", "im", "in", "io",
+        "iq", "ir", "is", "it", "je", "jm", "jo",
+        "jp", "ke", "kg", "kh", "ki", "km", "kn",
         "kp", "kr", "kw", "ky", "kz", "la", "lb", "lc",
         "li", "lk", "lr", "ls", "lt", "lu", "lv", "ly",
         "ma", "mc", "md", "me", "mf", "mg", "mh", "mk",
@@ -89,6 +89,8 @@ document.addEventListener('DOMContentLoaded', function() {
         "vu", "wf", "ws", "ye", "yt", "za", "zm", "zw"
     ];
 
+    const events = [jackpot];
+
     let cursor = `<span id="terminal__prompt--cursor" style="height: 0.8em; animation: blink 1200ms linear infinite;"></span>`;
     let consoleCursor = `<span id="terminal__prompt--consolecursor" style="height: 0.8em; animation: consoleblink 1200ms linear infinite;"></span>`;
     let promptUser = `<span class="prompt-user" style="color: ${currentUserColor};">mainroom@${currentUsername}:</span>`;
@@ -103,6 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
     openingscreen()
     help()
     displayRandomFlags()
+    eventHandler()
 
     writingMessage.innerHTML = `${hiddenChar}${promptUser}${promptLocation}${promptBling}`;
     writingMessageConsole.innerHTML = `${promptAdmin}${promptLocation}${promptBling}${consoleCursor}`;
@@ -355,35 +358,60 @@ document.addEventListener('DOMContentLoaded', function() {
         );
     }
     
-    function openingscreen() {
-        const openingscreenstring = 
-    `   _____                 .__  .__                __________                                   
-      /  _  \\   _____   ____ |  | |__| ____   ______ \\______   \\ ____   ____   _____              
-     /  /_\\  \\ /     \\_/ __ \\|  | |  |/ __ \\ /  ___/  |       _//  _ \\ /  _ \\ /     \\             
-    /    |    \\  Y Y  \\  ___/|  |_|  \\  ___/ \\___ \\   |    |   (  <_> |  <_> )  Y Y  \\            
-    \\____|__  /__|_|  /\\___  >____/__|\\___  >____  >  |____|_  /\\____/ \\____/|__|_|  / /\\  /\\  /\\ 
-            \\/      \\/     \\/             \\/     \\/          \\/                    \\/  \\/  \\/  \\/ 
+    // function openingscreen() {
+    //     const openingscreenstring = 
+    // `   _____                 .__  .__                __________                                   
+    //   /  _  \\   _____   ____ |  | |__| ____   ______ \\______   \\ ____   ____   _____              
+    //  /  /_\\  \\ /     \\_/ __ \\|  | |  |/ __ \\ /  ___/  |       _//  _ \\ /  _ \\ /     \\             
+    // /    |    \\  Y Y  \\  ___/|  |_|  \\  ___/ \\___ \\   |    |   (  <_> |  <_> )  Y Y  \\            
+    // \\____|__  /__|_|  /\\___  >____/__|\\___  >____  >  |____|_  /\\____/ \\____/|__|_|  / /\\  /\\  /\\ 
+    //         \\/      \\/     \\/             \\/     \\/          \\/                    \\/  \\/  \\/  \\/ 
                                                                                              
-    1> For commands /help in the console.\n
-    2> You won't be able to see message content or send messages unless you have the session key. You can /sessionkey in the console to enter your key.\n
-    3> Move + Change active window with the title bar`;
+    // 1> For commands /help in the console.\n
+    // 2> You won't be able to see message content or send messages unless you have the session key. You can /sessionkey in the console to enter your key.\n
+    // 3> Move + Change active window with the title bar`;
     
-        const span = document.createElement('span');
-        span.style.color = '#ff00ff';
-        span.textContent = openingscreenstring;
+    //     const span = document.createElement('span');
+    //     span.style.color = '#ff00ff';
+    //     span.textContent = openingscreenstring;
     
-        messages.appendChild(span);
+    //     messages.appendChild(span);
+    // }
+
+    function openingscreen() {
+        const img = document.createElement('img');
+        img.src = 'elements/amroomsized.png'; 
+        img.style.width = '75%'; 
+        img.style.height = 'auto'; 
+        messages.appendChild(img);
+        
+        const instructions = document.createElement('span');
+        instructions.style.color = '#ff00ff';
+        instructions.textContent = `
+        1> For commands /help in the console.
+        2> You won't be able to see message content or send messages unless you have the session key. You can /sessionkey in the console to enter your key.
+        3> Move + Change active window with the title bar
+        `;
+        
+        messages.appendChild(instructions);
     }
+    
 
     function displayRandomFlags() {
         const flagBanner = document.getElementById('flag-banner');
         flagBanner.innerHTML = ''; // clear previous flags
-        const shuffledCodes = countryCodes.sort(() => 0.5 - Math.random()).slice(0, 20);
+        const shuffledCodes = countryCodes.sort(() => 0.5 - Math.random()).slice(0, 30);
         shuffledCodes.forEach(code => {
             const img = document.createElement('img');
             img.src = `flags/${code}.gif`; // Path to the flag image
             img.alt = `${code} flag`; // Accessibility text
-            flagBanner.appendChild(img); // Add to the banner
+            flagBanner.appendChild(img); // add to the banner
+        });
+        shuffledCodes.forEach(code => {
+            const img = document.createElement('img');
+            img.src = `flags/${code}.gif`; // Same flag images
+            img.alt = `${code} flag`; // Accessibility text
+            flagBanner.appendChild(img); // Add again to create loop
         });
     }
     
@@ -673,6 +701,29 @@ document.addEventListener('DOMContentLoaded', function() {
             randomString += characters[randomIndex];
         }
         return randomString;
+    }
+
+    function eventHandler() {
+        setInterval(() => {
+            const randomEvent = events[Math.floor(Math.random() * events.length)];
+            randomEvent();
+        }, 10000); // 10 seconds interval
+    }
+
+    function jackpot() {
+        const overlay = document.getElementById('money');
+        const videoContainer = document.getElementById('jackpot-vid');
+        const video = document.getElementById('jackpot-video');
+        overlay.style.display = 'flex';
+        // show and play the video
+        videoContainer.style.display = 'block';
+        video.play();
+    
+        // hide the overlay and video when the video ends
+        video.onended = () => {
+            overlay.style.display = 'none';
+            videoContainer.style.display = 'none';
+        };
     }
 
     userInput.addEventListener('blur', function() {
