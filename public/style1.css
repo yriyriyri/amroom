@@ -4,10 +4,7 @@
 @import url('https://fonts.googleapis.com/css?family=Mrs+Saint+Delafield');
 
 body { 
-  /* background: linear-gradient(45deg, #0f0be9 0%,#0bebdf 100%);  */
-  /* background-image: url('https://i.ibb.co/vXKCtTp/1725217284794c-crop-2024-09-18-22-43-51.jpg');   */
-  /* background-image: url('https://i.pinimg.com/736x/cd/94/8e/cd948e379da51264047bc20c0b772731.jpg'); */
-  background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_FWF2judaujT30K9sMf-tZFhMWpgP6xCemw&s');
+  background-image: url('elements/images.jpg');
   background-size: cover;                      
   background-position: center;                 
   background-repeat: no-repeat;                
@@ -16,6 +13,33 @@ body {
   font-family: 'Ubuntu';
   overflow: hidden;
 } 
+
+.dragon-gif {
+  position: absolute; 
+  right: 20px; 
+  top: 20px; 
+  width: 200px; 
+  height: 500px; 
+  z-index: 400; /* Ensure the GIF appears above other content */
+}
+
+.flag-banner {
+  position: absolute; 
+  top: 20px; 
+  left: 0; 
+  display: flex;
+  justify-content: flex-start; /* align flags to the left */
+  align-items: center; 
+  margin: 0; 
+  z-index: -1; 
+}
+
+.flag-banner img {
+  width: 50px; 
+  height: auto; 
+  margin: 0 5px; 
+}
+
 #container {  
   display: flex;  
   justify-content: center;  

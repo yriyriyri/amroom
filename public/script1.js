@@ -55,8 +55,42 @@ document.addEventListener('DOMContentLoaded', function() {
         'Ubuntu', 'Ubuntu Mono', 'Tangerine', 'Mrs Saint Delafield'
     ];
 
+    const countryCodes = [
+        "ad", "ae", "af", "ag", "ai", "al", "am", "ao",
+        "aq", "ar", "as", "at", "au", "aw", "ax", "az",
+        "ba", "bb", "bd", "be", "bf", "bg", "bh", "bi",
+        "bj", "bl", "bm", "bn", "bo", "bq", "br", "bs",
+        "bt", "bv", "bw", "by", "bz", "ca", "cc", "cd",
+        "cf", "cg", "ci", "ck", "cl", "cm", "cn",
+        "co", "cr", "cu", "cv", "cw", "cx", "cy", "cz",
+        "de", "dj", "dk", "dm", "do", "dz", "ec", "ee",
+        "eg", "eh", "er", "es", "et", "fi", "fj", "fm",
+        "fo", "fr", "ga", "gb", "gd", "ge", "gf", "gg",
+        "gh", "gi", "gl", "gm", "gn", "gp", "gq", "gr",
+        "gt", "gu", "gw", "gy", "hk", "hm", "hn", "hr",
+        "ht", "hu", "id", "ie", "il", "im", "in", "io",
+        "iq", "ir", "is", "it", "je", "jm", "jn", "jo",
+        "jp", "ke", "kg", "kh", "ki", "kj", "km", "kn",
+        "kp", "kr", "kw", "ky", "kz", "la", "lb", "lc",
+        "li", "lk", "lr", "ls", "lt", "lu", "lv", "ly",
+        "ma", "mc", "md", "me", "mf", "mg", "mh", "mk",
+        "ml", "mm", "mn", "mo", "mp", "mq", "mr", "ms",
+        "mt", "mu", "mv", "mw", "mx", "my", "mz", "na",
+        "nc", "ne", "nf", "ng", "ni", "nl", "no",
+        "nr", "nu", "nz", "om", "pa", "pe", "pf", "pg",
+        "ph", "pk", "pl", "pm", "pn", "pr", "pt", "pw",
+        "py", "qa", "re", "ro", "rs", "ru", "rw", "sa",
+        "sb", "sc", "sd", "se", "sg", "sh", "si", "sj",
+        "sk", "sl", "sm", "sn", "so", "sr", "ss", "st",
+        "sv", "sx", "sy", "sz", "tc", "td", "tf", "tg",
+        "th", "tj", "tk", "tl", "tm", "tn", "to", "tr",
+        "ts", "tt", "tv", "tz", "ua", "ug", "um", "us",
+        "uy", "uz", "vc", "ve", "vg", "vi", "vn",
+        "vu", "wf", "ws", "ye", "yt", "za", "zm", "zw"
+    ];
+
     let cursor = `<span id="terminal__prompt--cursor" style="height: 0.8em; animation: blink 1200ms linear infinite;"></span>`;
-    let consoleCursor = `<span id="terminal__prompt--consolecursor" style="height: 0.8em; animation: consoleblink 1200ms linear infinite;"></span>`
+    let consoleCursor = `<span id="terminal__prompt--consolecursor" style="height: 0.8em; animation: consoleblink 1200ms linear infinite;"></span>`;
     let promptUser = `<span class="prompt-user" style="color: ${currentUserColor};">mainroom@${currentUsername}:</span>`;
 
     let isDragging = false;
@@ -68,6 +102,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     openingscreen()
     help()
+    displayRandomFlags()
 
     writingMessage.innerHTML = `${hiddenChar}${promptUser}${promptLocation}${promptBling}`;
     writingMessageConsole.innerHTML = `${promptAdmin}${promptLocation}${promptBling}${consoleCursor}`;
@@ -314,9 +349,9 @@ document.addEventListener('DOMContentLoaded', function() {
             '9. /fontlist - Display a list of available fonts.\n' +
             '10./link <url> - Display a hyperlink to the specified URL.\n' +
             '11./image <url> - Display an image from the specified URL.' +
-            `<span style="color: #ff0000; background-color: #000000; padding: 2px;">Currently disabled for security</span>\n` +
+            `<span style="color: #ff0000; background-color: #000000; padding: 2px; font-size: 0.6em;">Currently disabled for security</span>\n` +
             '12./background <url> - Change the background image to the specified URL.' +
-            `<span style="color: #ff0000; background-color: #000000; padding: 2px;">Currently disabled for security</span>` 
+            `<span style="color: #ff0000; background-color: #000000; padding: 2px; font-size: 0.6em;">Currently disabled for security</span>` 
         );
     }
     
@@ -339,6 +374,18 @@ document.addEventListener('DOMContentLoaded', function() {
     
         messages.appendChild(span);
     }
+
+    function displayRandomFlags() {
+        const flagBanner = document.getElementById('flag-banner');
+        flagBanner.innerHTML = ''; // clear previous flags
+        const shuffledCodes = countryCodes.sort(() => 0.5 - Math.random()).slice(0, 20);
+        shuffledCodes.forEach(code => {
+            const img = document.createElement('img');
+            img.src = `flags/${code}.gif`; // Path to the flag image
+            img.alt = `${code} flag`; // Accessibility text
+            flagBanner.appendChild(img); // Add to the banner
+        });
+    }
     
     function isValidHexColor(color) {
         return /^#[0-9A-Fa-f]{6}$/.test(color);
@@ -353,7 +400,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const parsedSize = parseInt(fontsize, 10);
         return !isNaN(parsedSize) && parsedSize > 6 && parsedSize < 31;
     }
-
 
     function isValidImageUrl(url) {
         const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
