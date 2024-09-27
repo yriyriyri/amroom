@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const terminalBarConsole = document.getElementById('terminal__bar-console')
     const terminal = document.getElementById('terminal');
     const terminalConsole = document.getElementById('terminalconsole');
+    const loading = document.getElementById('loading');
     
     const socket = new WebSocket('ws://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion');
     // const socket = new WebSocket('ws://localhost:3000');
@@ -89,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
         "vu", "wf", "ws", "ye", "yt", "za", "zm", "zw"
     ];
 
-    // const events = [flashImage];
+    const events = [flashImage];
 
     let cursor = `<span id="terminal__prompt--cursor" style="height: 0.8em; animation: blink 1200ms linear infinite;"></span>`;
     let consoleCursor = `<span id="terminal__prompt--consolecursor" style="height: 0.8em; animation: consoleblink 1200ms linear infinite;"></span>`;
@@ -105,16 +106,13 @@ document.addEventListener('DOMContentLoaded', function() {
     openingscreen()
     help()
     displayRandomFlags()
-    // eventHandler()
+    eventHandler()
 
     writingMessage.innerHTML = `${hiddenChar}${promptUser}${promptLocation}${promptBling}`;
     writingMessageConsole.innerHTML = `${promptAdmin}${promptLocation}${promptBling}${consoleCursor}`;
 
-
-
     socket.addEventListener('message', function(event) {
         const message = event.data;
-        console.log('Encrypted message:', message);
     
         decryptMessage(message, sessionKey)
             .then(decryptedMessage => {
@@ -129,7 +127,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     messages.scrollTop = messages.scrollHeight;
                 }else{
                     const parsedData = JSON.parse(decryptedMessage);
-                    // console.log('Parsed data:', parsedData);
         
                     const listItem = document.createElement('li');
                     
@@ -138,8 +135,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         tempContainer.innerHTML = parsedData; 
                         const img = tempContainer.querySelector('img');
                         
-                        // Wait for the image to load before appending to the list
+                        // wait for the image to load before appending to the list
                         img.addEventListener('load', () => {
+                            if (parsedData.includes(currentUsername)){
+                                loading.style.display = 'none';
+                            }
                             listItem.innerHTML = parsedData;
                             messages.appendChild(listItem);
                             messages.scrollTop = messages.scrollHeight; // scroll to the bottom
@@ -148,6 +148,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         img.src = img.src;
                     } else {
                         listItem.innerHTML = parsedData;
+                        if (parsedData.includes(currentUsername)){
+                            loading.style.display = 'none';
+                        }
                         messages.appendChild(listItem);
                         messages.scrollTop = messages.scrollHeight; // scroll to the bottom
                     }
@@ -157,9 +160,9 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     });
     
-
     async function sendMessage(message, parameter) {
         if (parameter) {
+            loading.style.display = 'block';
             const sanitizedMessage = sanitizeInput(message);
             socket.send(JSON.stringify(sanitizedMessage));
         } else {
@@ -307,7 +310,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 break;
             case 'image':
                 if (isValidImageUrl(commandArguments)) {
-                    displayImage(commandArguments);
+                    //displayImage(commandArguments);
+                    printCmdResponse(`Images currently disabled,,,, back soon`);
                 } else {
                     printCmdResponse(`Invalid image URL: ${commandArguments}`);
                 }
@@ -324,7 +328,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 break;
             case 'background':
                 if (isValidImageUrl(commandArguments)){
-                    applyBackground(commandArguments);
+                    // applyBackground(commandArguments);
+                    printCmdResponse(`Images currently disabled,,,, back soon`);
                 } else {
                     printCmdResponse(`Invalid image URL: ${commandArguments}`);
                 }
@@ -559,6 +564,8 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+        loading.style.display = 'block';
+
         lastKeyChangeTime = now; // Update the last change time
         sessionKey = key;
         isKeyValid = await checkKey(key);
@@ -566,9 +573,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isKeyValid) {
             isKeyValid = true
             printCmdResponse('Key is valid');
+            loading.style.display = 'none';
         } else {
             isKeyValid = false
             printCmdResponse('Key is invalid');
+            loading.style.display = 'none';
         }
     }
 
@@ -703,41 +712,75 @@ document.addEventListener('DOMContentLoaded', function() {
         return randomString;
     }
 
-    // function eventHandler() {
-    //     setInterval(() => {
-    //         const randomEvent = events[Math.floor(Math.random() * events.length)];
-    //         randomEvent();
-    //     }, 10000); // 10 seconds interval
-    // }
+    function eventHandler() {
+        setInterval(() => {
+            const randomEvent = events[Math.floor(Math.random() * events.length)];
+            randomEvent();
+        }, 10000); // 10 seconds interval
+    }
 
-    // function flashImage() {
-    //     const images = [
+    function flashImage() {
+        const images = [
+           "/elements/subliminalmessaging/1.jpg",
+           "/elements/subliminalmessaging/2.jpg",
+           "/elements/subliminalmessaging/3.jpg",
+           "/elements/subliminalmessaging/4.png",
+           "/elements/subliminalmessaging/5.png",
+           "/elements/subliminalmessaging/6.jpg",
+           "/elements/subliminalmessaging/7.png",
+           "/elements/subliminalmessaging/8.jpg",
+           "/elements/subliminalmessaging/9.png",
+           "/elements/subliminalmessaging/10.png",
+           "/elements/subliminalmessaging/11.gif",
+           "/elements/subliminalmessaging/12.gif",
+           "/elements/subliminalmessaging/13.png",
            
-    //     ];
+           "/elements/subliminalmessaging/15.png",
+           "/elements/subliminalmessaging/16.jpg",
+
+           "/elements/subliminalmessaging/18.png",
+           
+           "/elements/subliminalmessaging/20.png",
+           "/elements/subliminalmessaging/21.png",
+           "/elements/subliminalmessaging/22.png",
+           "/elements/subliminalmessaging/23.png",
+          
+           "/elements/subliminalmessaging/25.png",
+           "/elements/subliminalmessaging/26.png",
+           
+           
+
+        ];
     
-    //     // Randomly select an image
-    //     const randomIndex = Math.floor(Math.random() * images.length);
-    //     const selectedImage = images[randomIndex];
-    //     const img = document.getElementById('flash-image');
-    //     img.src = selectedImage; // Set the source to the randomly selected image
-    //     img.style.display = 'block'; // Show the image
+        const randomIndex = Math.floor(Math.random() * images.length);
+        const selectedImage = images[randomIndex];
+        const img = document.getElementById('flash-image');
+        img.src = selectedImage; 
+        img.style.display = 'block'; 
+
+        const maxWidth = window.innerWidth * 0.5;  
+        const maxHeight = window.innerHeight * 0.5; 
+        img.style.maxWidth = `${maxWidth}px`;
+        img.style.maxHeight = `${maxHeight}px`;
     
-    //     // Randomly position the image on the screen
-    //     img.style.top = `${Math.random() * (window.innerHeight - img.naturalHeight)}px`;
-    //     img.style.left = `${Math.random() * (window.innerWidth - img.naturalWidth)}px`;
+        // timeout to wait until resized
+        setTimeout(() => {
+            img.style.top = `${Math.random() * (window.innerHeight - img.offsetHeight)}px`;
+            img.style.left = `${Math.random() * (window.innerWidth - img.offsetWidth)}px`;
+        }, 10); 
     
-    //     // Flashing logic
-    //     let count = 0; // Count the number of flashes
-    //     const flashInterval = setInterval(() => {
-    //         if (count < 3) {
-    //             img.style.opacity = img.style.opacity === '1' ? '0' : '1'; // Toggle opacity
-    //             count++;
-    //         } else {
-    //             clearInterval(flashInterval); // Stop the flashing
-    //             img.style.display = 'none'; // Hide the image after flashing
-    //         }
-    //     }, 100); // Flash every 100 milliseconds (0.1 seconds)
-    // }
+        // flasing
+        let count = 0; 
+        const flashInterval = setInterval(() => {
+            if (count < 5) { 
+                img.style.opacity = img.style.opacity === '1' ? '0' : '1'; 
+                count++;
+            } else {
+                clearInterval(flashInterval); 
+                img.style.display = 'none'; 
+            }
+        }, 100);
+    }
     
 
     userInput.addEventListener('blur', function() {
