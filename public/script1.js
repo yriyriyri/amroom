@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function() {
     openingscreen()
     help()
     displayRandomFlags()
-    eventHandler()
+    // eventHandler()
 
     writingMessage.innerHTML = `${hiddenChar}${promptUser}${promptLocation}${promptBling}`;
     writingMessageConsole.innerHTML = `${promptAdmin}${promptLocation}${promptBling}${consoleCursor}`;
@@ -393,9 +393,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const instructions = document.createElement('span');
         instructions.style.color = '#ff00ff';
         instructions.textContent = `
-        1> For commands /help in the console.
-        2> You won't be able to see message content or send messages unless you have the session key. You can /sessionkey in the console to enter your key.
-        3> Move + Change active window with the title bar
+        1> 4 commands /help in console
+        2> won't be able to see message content   or send messages unless you have a session key  You can /sessionkey in the console to enter your key
+        3> mmove + Change active window with the title bar
         `;
         
         messages.appendChild(instructions);
