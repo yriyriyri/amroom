@@ -14,8 +14,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const terminalConsole = document.getElementById('terminalconsole');
     const loading = document.getElementById('loading');
     
-    const socket = new WebSocket('ws://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion');
-    // const socket = new WebSocket('ws://localhost:3000');
+    // const socket = new WebSocket('ws://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion');
+    const socket = new WebSocket('ws://localhost:3000');
 
     socket.onopen = () => {
         console.log('Connected to WebSocket server');
@@ -43,7 +43,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let lastKeyChangeTime = 0;
     const keyChangeDelay = 10000; // 2 seconds
     
-    // web-safe fonts
     const webSafeFonts = [
         'Arial', 'Verdana', 'Helvetica', 'Times New Roman', 'Courier New', 
         'Georgia', 'Palatino', 'Garamond', 'Bookman', 'Comic Sans MS', 
@@ -51,7 +50,6 @@ document.addEventListener('DOMContentLoaded', function() {
         'Sans-Serif', 'Serif', 'Monospace'
     ];
 
-    // custom fonts (imported via @import or @font-face) ADD NEW FONTS
     const customFonts = [
         'Ubuntu', 'Ubuntu Mono', 'Tangerine', 'Mrs Saint Delafield'
     ];
@@ -85,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function() {
         "sk", "sl", "sm", "sn", "so", "sr", "ss", "st",
         "sv", "sx", "sy", "sz", "tc", "td", "tf", "tg",
         "th", "tj", "tk", "tl", "tm", "tn", "to", "tr",
-        "ts", "tt", "tv", "tz", "ua", "ug", "um", "us",
+        "tt", "tv", "tz", "ua", "ug", "um", "us",
         "uy", "uz", "vc", "ve", "vg", "vi", "vn",
         "vu", "wf", "ws", "ye", "yt", "za", "zm", "zw"
     ];
@@ -362,26 +360,6 @@ document.addEventListener('DOMContentLoaded', function() {
             `<span style="color: #ff0000; background-color: #000000; padding: 2px; font-size: 0.6em;">Currently disabled for security</span>` 
         );
     }
-    
-    // function openingscreen() {
-    //     const openingscreenstring = 
-    // `   _____                 .__  .__                __________                                   
-    //   /  _  \\   _____   ____ |  | |__| ____   ______ \\______   \\ ____   ____   _____              
-    //  /  /_\\  \\ /     \\_/ __ \\|  | |  |/ __ \\ /  ___/  |       _//  _ \\ /  _ \\ /     \\             
-    // /    |    \\  Y Y  \\  ___/|  |_|  \\  ___/ \\___ \\   |    |   (  <_> |  <_> )  Y Y  \\            
-    // \\____|__  /__|_|  /\\___  >____/__|\\___  >____  >  |____|_  /\\____/ \\____/|__|_|  / /\\  /\\  /\\ 
-    //         \\/      \\/     \\/             \\/     \\/          \\/                    \\/  \\/  \\/  \\/ 
-                                                                                             
-    // 1> For commands /help in the console.\n
-    // 2> You won't be able to see message content or send messages unless you have the session key. You can /sessionkey in the console to enter your key.\n
-    // 3> Move + Change active window with the title bar`;
-    
-    //     const span = document.createElement('span');
-    //     span.style.color = '#ff00ff';
-    //     span.textContent = openingscreenstring;
-    
-    //     messages.appendChild(span);
-    // }
 
     function openingscreen() {
         const img = document.createElement('img');
@@ -669,7 +647,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     async function checkKey(parameter) {
         try {
-            const response = await fetch('http://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion/check-key', { //CALL PROPER DOMAIN UPON DEPLOYINH
+            const response = await fetch('http://localhost:3000/check-key', { //CALL PROPER DOMAIN UPON DEPLOYINH http://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion/check-key
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
