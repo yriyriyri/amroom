@@ -9,6 +9,8 @@ const rateLimit = require('express-rate-limit');
 const fs = require('fs'); 
 const cors = require('cors');
 
+// cors Checks 
+
 const allowedOrigins = [
     'http://localhost:3000',
     'http://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion',
@@ -19,11 +21,15 @@ const app = express();
 app.use(cors());
 const server = http.createServer(app);
 
+//rate limit
+
 const limiter = rateLimit({
     windowMs: 1 * 60 * 1000, 
     max: 5, 
     message: { error: 'Too many attempts, please try again later.' }
 });
+
+//csp UNFINISHED
 
 app.use((req, res, next) => {
     res.setHeader("Content-Security-Policy", "default-src http: ws: data:; style-src http: 'unsafe-inline'; script-src http: 'unsafe-inline' 'unsafe-eval' data:; connect-src http: ws:; img-src *;");
@@ -36,6 +42,8 @@ app.use((req, res, next) => {
     next();
 });
 
+// serving files ,,, index1 jumpoff point
+
 app.use(express.json());
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -45,6 +53,8 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index1.html'));
     console.log('Served index1.html');
 });
+
+//init websocket serv
 
 const wss = new WebSocket.Server({
     server: server,
@@ -63,6 +73,7 @@ const wss = new WebSocket.Server({
     }
 });
 
+//cyber sec
 
 function logInvalidAttempt(ip, origin, parameter) {
     const logMessage = `${new Date().toISOString()} - Invalid attempt from IP: ${ip}, Origin: ${origin}, Key: ${parameter}\n`;
@@ -71,6 +82,8 @@ function logInvalidAttempt(ip, origin, parameter) {
         if (err) console.error('Error logging invalid attempt:', err);
     });
 }
+
+// encrption cypher funct
 
 function encrypt(text, key) {
     const iv = crypto.randomBytes(12);
@@ -82,6 +95,8 @@ function encrypt(text, key) {
 
     return iv.toString('hex') + ':' + authTag + ':' + encrypted;
 }
+
+// check ket api ,,, cybersec limiter
 
 app.post('/check-key', limiter, (req, res) => {
     const origin = req.get('origin');
@@ -101,9 +116,10 @@ app.post('/check-key', limiter, (req, res) => {
     return res.status(200).json({ match: keysMatch });
 });
 
+// running funct ,,, interact with user
 
 wss.on('connection', ws => {
-    console.log('WebSocket connection established');
+    console.log('webSocket connection established');
     ws.on('message', message => {
         try {
             const data = JSON.parse(message); 
@@ -116,23 +132,25 @@ wss.on('connection', ws => {
                 }
             });
         } catch (error) {
-            console.error('Error parsing message:', error);
+            console.error('error parsing message:', error);
         }
     });
 
     ws.on('close', () => {
-        console.log('WebSocket connection closed');
+        console.log('webSocket connection closed');
     });
 
     ws.on('error', (error) => {
-        console.error('WebSocket error:', error);
+        console.error('webSocket error:', error);
     });
 });
 
 
+// start serv er   
+
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).send('Something broke!');
+    res.status(500).send('broken');
 });
 
 const PORT = process.env.PORT || 3000; 

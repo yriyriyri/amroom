@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const terminalConsole = document.getElementById('terminalconsole');
     const loading = document.getElementById('loading');
     
+    // opemn websocket
     // const socket = new WebSocket('ws://6bgeke4fcy4hbuo7tpn74pblhaxeqfyqkyqa3ddw6vwdv3ouocz7vwid.onion');
     const socket = new WebSocket('ws://localhost:3000');
 
@@ -598,23 +599,14 @@ document.addEventListener('DOMContentLoaded', function() {
     async function decryptMessage(encryptedMessage, key) {
         try {
             const [ivHex, authTagHex, encryptedHex] = encryptedMessage.split(':');
-            // console.log('IV:', ivHex, 'Auth Tag:', authTagHex, 'Encrypted Data:', encryptedHex);
-    
-            // convert hex strings to Uint8Array
             const iv = hexToUint8Array(ivHex);
             const authTag = hexToUint8Array(authTagHex);
             const encrypted = hexToUint8Array(encryptedHex);
     
-            // console.log('IV Uint8Array:', iv, 'Auth Tag Uint8Array:', authTag, 'Encrypted Uint8Array:', encrypted);
-    
-            // combine encrypted data with auth tag (AES-GCM expects them together)
             const combinedData = new Uint8Array(encrypted.length + authTag.length);
             combinedData.set(encrypted);
             combinedData.set(authTag, encrypted.length);
     
-            // console.log('Combined Encrypted Data:', combinedData);
-    
-            // import the key for decryption
             const cryptoKey = await crypto.subtle.importKey(
                 'raw',
                 hexToUint8Array(key),
@@ -623,9 +615,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 ['decrypt']
             );
     
-            // console.log('CryptoKey imported successfully');
-    
-            // decrypt the message
             return crypto.subtle.decrypt(
                 {
                     name: 'AES-GCM',
@@ -633,9 +622,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     tagLength: 128
                 },
                 cryptoKey,
-                combinedData // use the combined encrypted data and auth tag
+                combinedData 
             ).then(decryptedArrayBuffer => {
-                // Convert ArrayBuffer to string
                 const decoder = new TextDecoder('utf-8');
                 return decoder.decode(decryptedArrayBuffer);
             });
@@ -655,16 +643,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify({ parameter })
             });
     
-            // Check if the response is ok (status in the range 200-299)
+            // check if the response is ok (status in the range 200-299)
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
     
             const data = await response.json();
-            return data.match; // This will be true or false based on the response
+            return data.match; // true / false based on the response
         } catch (error) {
             console.error('Error:', error);
-            return false; // Return false in case of an error
+            return false; 
         }
     }
 
@@ -683,7 +671,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const randomLength = Math.floor(Math.random() * maxLength) + 1;
         let randomString = '';
         for (let i = 0; i < randomLength; i++) {
-            // Select a random character from the characters string
             const randomIndex = Math.floor(Math.random() * characters.length);
             randomString += characters[randomIndex];
         }
@@ -694,7 +681,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setInterval(() => {
             const randomEvent = events[Math.floor(Math.random() * events.length)];
             randomEvent();
-        }, 10000); // 10 seconds interval
+        }, 10000); 
     }
 
     function flashImage() {
@@ -725,7 +712,6 @@ document.addEventListener('DOMContentLoaded', function() {
           
            "/elements/subliminalmessaging/25.png",
            "/elements/subliminalmessaging/26.png",
-           
            
 
         ];
